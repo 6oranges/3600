@@ -9,6 +9,11 @@
 #include <cmath>
 #include <string.h>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <chrono>
+#include <map>
 using namespace std;
 #include "glut.h"
 #include "graphics.h"
@@ -27,7 +32,7 @@ GLdouble whiteMaterial[] = {1.0, 1.0, 1.0, 1.0};
 
 double screen_x = 700;
 double screen_y = 500;
-
+double speed_m = 1;
 // The particle system.
 ParticleSystem PS;
 
@@ -93,6 +98,18 @@ void text_output(double x, double y, char *string)
     glDisable(GL_BLEND);
 }
 
+double getDeltaTime(){
+	using namespace std::chrono;
+ 	static steady_clock::time_point clock_begin = steady_clock::now();
+  	steady_clock::time_point clock_end = steady_clock::now();
+
+  	steady_clock::duration time_span = clock_end - clock_begin;
+
+ 	 double dt = double(time_span.count()) * steady_clock::period::num / steady_clock::period::den;
+	clock_begin=clock_end;
+	return dt;
+}
+
 
 //
 // GLUT callback functions
@@ -106,7 +123,8 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3dv(whiteMaterial);
 
-	static double DeltaT = 0.1;
+	double DeltaT = 0.1;
+	DeltaT = getDeltaTime();
 	//EulerStep(PS, DeltaT);
 	//MidpointStep(PS, DeltaT);
 	RungeKuttaStep(PS, DeltaT);
@@ -163,7 +181,7 @@ void display(void)
 			SpringForce * sf = (SpringForce*)f;
 			Particle * p1 = sf->GetParticle1();
 			Particle * p2 = sf->GetParticle2();
-			glColor3dv(greenMaterial);
+			glColor3d(sf->r(),sf->g(),sf->b());
 			DrawLine(p1->GetPositionx(), p1->GetPositiony(),  p2->GetPositionx(), p2->GetPositiony());
 		}
 	}
@@ -245,205 +263,177 @@ void mouse(int mouse_button, int state, int x, int y)
 	}
 	glutPostRedisplay();
 }
+class Parser{
+public:
+	Parser(istream* fin);
+	Parser(string filename);
+	double Value();
+	void ParseBlock(ParticleSystem& ps);
+private:
+	istream* mFin;
+	map<string,double> mLabels;
+	map<string,string> mBlocks;
+	map<string,vector<double>> mBundles;
+	string mBundleIndex;
+	int mBundleValueIndex;
+	vector<Particle*> mParticles;
 
-void InitParticles1()
-{
-	Particle *p1 = new Particle(100, 200,  4.0, -1.0,  10, false);
-	PS.AddParticle(p1);
-
-	Particle *p2 = new Particle(200, 200,  4.0, 0.0,  5, false);
-	PS.AddParticle(p2);
-
-	Particle *p3 = new Particle(20, 405,  5.0, 1.0,  5, false);
-	PS.AddParticle(p3);
-
-	Particle *p4 = new Particle(40, 410,  -1.0, -2.0,  5, false);
-	PS.AddParticle(p4);
-
-	Particle *p5 = new Particle(420, 405,  5.0, 1.0,  5, true);
-	PS.AddParticle(p5);
-
-	Particle *p6 = new Particle(440, 410,  -1.0, -2.0,  5, false);
-	PS.AddParticle(p6);
-
-	Particle *p7 = new Particle(490, 410,  -1.0, -2.0,  5, false);
-	PS.AddParticle(p7);
-
-	Force * F = new SpringForce(p1, p2, 4, 0.5, 80);
-	PS.AddForce(F);
-
-	Force * s2 = new SpringForce(p3, p4, .5, 0.1, 100);
-	PS.AddForce(s2);
-
-	Force * s3 = new SpringForce(p5, p6, .5, 0.1, 100);
-	PS.AddForce(s3);
-
-	Force * s4 = new SpringForce(p7, p6, .5, 0.1, 100);
-	PS.AddForce(s4);
-
-	Force * DF = new DragForce(.001, &PS);
-	PS.AddForce(DF);
-
-	double gravity[DIM] = {0.0, -0.50};
-	Force * F2 = new GravityForce(gravity, &PS);
-	PS.AddForce(F2);
-
+};
+Parser::Parser(istream* fin): mFin(fin){
+	mLabels["true"]=1;
+	mLabels["false"]=0;
 }
-
-void InitParticles2()
-{
-	bool hanging = false;
-
-	Particle *p1 = new Particle(100,300,0,0,2,hanging);
-	PS.AddParticle(p1);
-
-	Particle *p2 = new Particle(220,360,0,0,2,hanging);
-	PS.AddParticle(p2);
-
-	Particle *p3 = new Particle(215,300,0,0,2,false);
-	PS.AddParticle(p3);
-
-	Particle *p4 = new Particle(200,200,0,0,2,false);
-	PS.AddParticle(p4);
-
-	Particle *p5 = new Particle(200,105,0,0,2,false);
-	PS.AddParticle(p5);
-
-	Particle *p6 = new Particle(233,330,0,0,2,false);
-	PS.AddParticle(p6);
-
-	Particle *p7 = new Particle(250,380,0,0,2,hanging);
-	PS.AddParticle(p7);
-
-	Particle *p8 = new Particle(266,330,0,0,2,false);
-	PS.AddParticle(p8);
-
-	Particle *p9 = new Particle(280,360,0,0,2,hanging);
-	PS.AddParticle(p9);
-
-	Particle *p10 = new Particle(285,300,0,0,2,false);
-	PS.AddParticle(p10);
-
-	Particle *p11 = new Particle(300,200,0,0,2,false);
-	PS.AddParticle(p11);
-
-	Particle *p12 = new Particle(300,100,0,0,2,false);
-	PS.AddParticle(p12);
-
-	Particle *p13 = new Particle(400,300,0,0,2,hanging);
-	PS.AddParticle(p13);
-
-	double kSpringConstant = .2;
-	double kDampingConstant = 1.5;
-
-	PS.AddForce(new SpringForce(p1, p3, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p3, p4, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p4, p5, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p3, p6, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p6, p2, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p2, p7, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p7, p9, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p9, p8, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p8, p10, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p10, p11, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p11, p12, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p10, p13, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p3, p10, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p4, p11, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p6, p8, kSpringConstant, kDampingConstant));
-
-	PS.AddForce(new SpringForce(p1, p4, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p11, p13, kSpringConstant, kDampingConstant));
-	for(int i=0;i<5;i++)
-	{
-	PS.AddForce(new SpringForce(p5, p12, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p5, p11, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p4, p12, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p3, p11, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p4, p10, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p6, p10, kSpringConstant*2, kDampingConstant));
-	PS.AddForce(new SpringForce(p3, p8, kSpringConstant*2, kDampingConstant));
-	PS.AddForce(new SpringForce(p2, p9, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p6, p7, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p7, p8, kSpringConstant, kDampingConstant));
+double Parser::Value(){
+	if (mBundleIndex!=""){
+		mBundleValueIndex+=1;
+		if (mBundleValueIndex>=mBundles[mBundleIndex].size()){
+			mBundleIndex="";
+		}
+		else{
+			return mBundles[mBundleIndex][mBundleValueIndex];
+		}
 	}
-
-	double gravity[DIM] = {0.0, -.10};
-	Force * F2 = new GravityForce(gravity, &PS);
-	PS.AddForce(F2);
+	string value;
+	*mFin>>value;
+	if (value == "add" || value=="+"){
+		return Value()+Value();
+	}
+	else if (value == "sub" || value=="-"){
+		return Value()-Value();
+	}
+	else if (value == "mul" || value=="*"){
+		return Value()*Value();
+	}
+	else if (value == "sin"){
+		return sin(Value());
+	}
+	else if (value == "cos"){
+		return cos(Value());
+	}
+	else if (value == "atan2"){
+		return atan2(Value(),Value());
+	}
+	else if (value == "root"){
+		return sqrt(Value());
+	}
+	else if (mLabels.count(value)>0){
+		return mLabels[value];
+	}
+	else if (mBundles.count(value)>0){
+		mBundleValueIndex=0;
+		return mBundles[value][mBundleValueIndex];
+	}
+	else{
+		double v;
+		stringstream(value)>>v;
+		return v;
+	}
 }
-
-void InitParticles3()
-{
-	Particle *p1 = new Particle(200,150,0,0,2,false);
-	PS.AddParticle(p1);
-
-	Particle *p2 = new Particle(200,300,0,0,2,false);
-	PS.AddParticle(p2);
-
-	Particle *p3 = new Particle(300,300,0,0,2,false);
-	PS.AddParticle(p3);
-
-	Particle *p4 = new Particle(300,200,0,0,2,false);
-	PS.AddParticle(p4);
-
-	double kSpringConstant = 1;
-	double kDampingConstant = 1.5;
-
-	PS.AddForce(new SpringForce(p1, p2, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p2, p3, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p3, p4, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p4, p1, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p3, p1, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p4, p2, kSpringConstant, kDampingConstant));
-
-	double gravity[DIM] = {0.0, -.30};
-	Force * F2 = new GravityForce(gravity, &PS);
-	PS.AddForce(F2);
+void Parser::ParseBlock(ParticleSystem& ps){
+	while (*mFin){
+		string command;
+		*mFin>>command;
+		mLabels["point"]=mParticles.size();
+		if (command=="p"){
+			Particle *p1 = new Particle(Value(),Value(),Value(),Value(),Value(),Value());
+			ps.AddParticle(p1);
+			mParticles.push_back(p1);
+		}
+		else if (command=="s"){
+			ps.AddForce(new SpringForce(mParticles[Value()], mParticles[Value()], Value(), Value(), Value(), Value(), Value()));
+		}
+		else if (command=="screen"){
+			screen_x=Value();
+			screen_y=Value();
+		}
+		else if (command=="speed"){
+			speed_m=Value();
+		}
+		else if (command=="g"){
+			double gravity[DIM] = {Value(), Value()};
+			Force * gf = new GravityForce(gravity, &ps);
+			ps.AddForce(gf);
+		}
+		else if (command=="set"||command=="="){
+			string label;
+			*mFin>>label;
+			mLabels[label]=Value();
+		}
+		else if (command=="{"){
+			char v=0;
+			string label;
+			*mFin>>label;
+			stringstream ss;
+			while (*mFin&&v!='}'){
+				if (v){
+					ss<<v;
+				}
+				(*mFin).get(v);
+			}
+			mBlocks[label]=ss.str();
+		}
+		else if (command=="/*"){
+			string v;
+			while (*mFin&&v!="*/"){
+				*mFin>>v;
+			}
+		}
+		else if (command=="//"){
+			char v=0;
+			while (*mFin&&v!='\n'){
+				(*mFin).get(v);
+			}
+		}
+		else if (command=="bundle"){
+			string label;
+			*mFin>>label;
+			vector<double> b;
+			int length=Value();
+			for (int i=0;i<length;i++){
+				b.push_back(Value());
+			}
+			mBundles[label]=b;
+		}
+		else if (command=="call"){
+			
+			string label;
+			*mFin>>label;
+			stringstream ss=stringstream(mBlocks[label]); // new stream
+			istream* nFin=&ss; // Location new stream
+			istream* t=mFin; // Location old stream
+			mFin=nFin; // Change location
+			ParseBlock(ps); // Call
+			mFin=t; // Change back
+		}
+		else if (command=="say"){
+			string label;
+			*mFin>>label;
+			cout<<label<<":"<<mLabels[label]<<endl;
+		}
+		else if (command=="d"){
+			Force * df = new DragForce(Value(), &PS);
+			PS.AddForce(df);
+		}
+		else {
+			cout<<"No entiendo: "<<command<<endl;
+		}
+	}
 }
-
-void InitParticles4()
-{
-	Particle *p1 = new Particle(200,200,0,0,4,false);
-	PS.AddParticle(p1);
-
-	Particle *p2 = new Particle(200,300,0,0,4,true);
-	PS.AddParticle(p2);
-
-	Particle *p3 = new Particle(300,300,0,0,4,true);
-	PS.AddParticle(p3);
-
-	Particle *p4 = new Particle(300,200,0,0,4,false);
-	PS.AddParticle(p4);
-
-	double kSpringConstant = .8;
-	double kDampingConstant = 0.1;
-
-	PS.AddForce(new SpringForce(p1, p2, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p2, p3, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p3, p4, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p4, p1, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p3, p1, kSpringConstant, kDampingConstant));
-	PS.AddForce(new SpringForce(p2, p4, kSpringConstant, kDampingConstant));
-
-	double gravity[DIM] = {0.0, -4.30};
-	Force * F2 = new GravityForce(gravity, &PS);
-	PS.AddForce(F2);
-
-	Force * DF = new DragForce(.01, &PS);
-	PS.AddForce(DF);
-}
-
-
-// Your initialization code goes here.
-void InitializeMyStuff()
-{
-	InitParticles1();
-}
-
 
 int main(int argc, char **argv)
 {
+	string filename;
+	if (argc>1){
+		filename=argv[1];
+	}
+	else{
+		cout<<"Please enter filename: ";
+		cin>>filename;
+	}
+	ifstream fin;
+	fin.open(filename);
+	Parser p = Parser(&fin);
+	p.ParseBlock(PS);
 	glutInit(&argc, argv);
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
@@ -467,7 +457,7 @@ int main(int argc, char **argv)
 	glutMouseFunc(mouse);
 
 	glClearColor(.3,.3,.3,0);	
-	InitializeMyStuff();
+	
 
 	glutMainLoop();
 

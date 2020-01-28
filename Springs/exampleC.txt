@@ -1,0 +1,25 @@
+Particle *p1 = new Particle(200,150,0,0,2,false);
+	PS.AddParticle(p1);
+
+	Particle *p2 = new Particle(200,300,0,0,2,false);
+	PS.AddParticle(p2);
+
+	Particle *p3 = new Particle(300,300,0,0,2,false);
+	PS.AddParticle(p3);
+
+	Particle *p4 = new Particle(300,200,0,0,2,false);
+	PS.AddParticle(p4);
+
+	double kSpringConstant = 1;
+	double kDampingConstant = 1.5;
+
+	PS.AddForce(new SpringForce(p1, p2, kSpringConstant, kDampingConstant));
+	PS.AddForce(new SpringForce(p2, p3, kSpringConstant, kDampingConstant));
+	PS.AddForce(new SpringForce(p3, p4, kSpringConstant, kDampingConstant));
+	PS.AddForce(new SpringForce(p4, p1, kSpringConstant, kDampingConstant));
+	PS.AddForce(new SpringForce(p3, p1, kSpringConstant, kDampingConstant));
+	PS.AddForce(new SpringForce(p4, p2, kSpringConstant, kDampingConstant));
+
+	double gravity[DIM] = {0.0, -.30};
+	Force * F2 = new GravityForce(gravity, &PS);
+	PS.AddForce(F2);

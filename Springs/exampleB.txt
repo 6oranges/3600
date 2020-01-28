@@ -1,0 +1,54 @@
+set hanging 1
+set kSpringConstant .2
+set kSpringConstant*2 .4
+set kDampingConstant 1.5
+
+dt .1
+
+p 100 300 0 0 2 hanging
+p 100 300 0 0 2 hanging
+p 220 360 0 0 2 hanging
+p 215 300 0 0 2 0
+p 200 200 0 0 2 0
+p 200 105 0 0 2 0
+p 233 330 0 0 2 0
+p 250 380 0 0 2 hanging
+p 266 330 0 0 2 0
+p 280 360 0 0 2 hanging
+p 285 300 0 0 2 0
+p 300 200 0 0 2 0
+p 300 100 0 0 2 0
+p 400 300 0 0 2 hanging
+
+
+s 0 2 kSpringConstant kDampingConstant 1 1 1 1
+s 2 3 kSpringConstant kDampingConstant 1 1 1 1
+s 3 4 kSpringConstant kDampingConstant 1 1 1 1
+s 2 5 kSpringConstant kDampingConstant 1 1 1 1
+s 5 1 kSpringConstant kDampingConstant 1 1 1 1
+s 1 6 kSpringConstant kDampingConstant 1 1 1 1
+s 6 8 kSpringConstant kDampingConstant 1 1 1 1
+s 8 7 kSpringConstant kDampingConstant 1 1 1 1
+s 7 9 kSpringConstant kDampingConstant 1 1 1 1
+s 9 10 kSpringConstant kDampingConstant 1 1 1 1
+s 10 11 kSpringConstant kDampingConstant 1 1 1 1
+s 9 12 kSpringConstant kDampingConstant 1 1 1 1
+s 2 9 kSpringConstant kDampingConstant 1 1 1 1
+s 3 10 kSpringConstant kDampingConstant 1 1 1 1
+s 5 7 kSpringConstant kDampingConstant 1 1 1 1
+
+s 0 3 kSpringConstant kDampingConstant 1 1 1 1
+s 10 12 kSpringConstant kDampingConstant 1 1 1 1
+
+s 4 11 kSpringConstant kDampingConstant 1 1 1 1
+s 4 10 kSpringConstant kDampingConstant 1 1 1 1
+s 3 11 kSpringConstant kDampingConstant 1 1 1 1
+s 2 10 kSpringConstant kDampingConstant 1 1 1 1
+s 3 9 kSpringConstant kDampingConstant 1 1 1 1
+s 5 9 kSpringConstant*2 kDampingConstant 1 1 1 1
+s 2 7 kSpringConstant*2 kDampingConstant 1 1 1 1
+s 1 8 kSpringConstant kDampingConstant 1 1 1 1
+s 5 6 kSpringConstant kDampingConstant 1 1 1 1
+s 6 7 kSpringConstant kDampingConstant 1 1 1 1
+
+g 0.0 -.10

@@ -28,13 +28,16 @@ public:
 class SpringForce : public Force
 {
 public:
-	SpringForce(Particle* p1, Particle *p2, double spring_constant, double damping_constant, double rest_length=0);
+	SpringForce(Particle* p1, Particle *p2, double spring_constant, double damping_constant, double r, double g, double b, double rest_length=1);
 
 	virtual void Apply();
 	virtual FORCE_TYPE Type();
 
 	Particle* GetParticle1();
 	Particle* GetParticle2();
+	double r(){return mR;};
+	double g(){return mG;};
+	double b(){return mB;};
 
 private:
 	Particle* p1;
@@ -42,6 +45,7 @@ private:
 	double rest_length;
 	double spring_constant;
 	double damping_constant;
+	double mR,mG,mB;
 };
 
 //

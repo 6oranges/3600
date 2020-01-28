@@ -1,0 +1,130 @@
+/*
+Help for sanity:
+
+Anywhere a 'double', 'int', or 'bool' can be used a label can be used instead
+
+Predefined Labels
+	true = 1
+	false = 0
+	point = index of the next point
+
+Operations on doubles
+	add double double => double
+	sub double double => double
+	mul double double => double
+
+Definitions
+	p double:x double:y double:dx double:dy double:radius bool:fixed
+	s int:p1 int:p2 double:spring double:damping double:red double:green double:blue double:percentage
+	say label:label
+	points double:dx double:dy double:radius bool:fixed int:points <points>(double:x double:y)
+	dpoints double:x double:y double:dx double:dy double:radius bool:fixed int:points <points>(double:dx double:dy)
+	spoints double:x double:y double:dx double:dy double:radius bool:fixed int:points <points>(double:dx double:dy)
+	string double:spring double:damping double:red double:blue double:green double:percentage int:start_index int:points
+	matrix double:spring double:damping double:red double:blue double:green double:percentage int:start_index int:points
+	d double:drag_force
+	g double:x double:y
+	dt double:dt
+	set label:label double:double
+*/
+
+// Start code
+set ks 5
+set kd .5
+screen 1000 1000
+
+
+// d .0001
+g 0.0 -.5
+dt .016
+
+{ createcircle // takes x,y,r,pr,dx,dy,red,green,blue returns center
+	set h mul r .5
+	set r2 mul mul 1.41421356237 r .5
+	set r3 mul mul 1.73205080757 r .5
+	set -r sub 0 r
+	set -h sub 0 h
+	set -r2 sub 0 r2
+	set -r3 sub 0 r3
+	set center point
+	spoints x y dx dy pr false 17  0 0   r 0  r3 h  r2 r2  h r3  0 r  -h r3  -r2 r2  -r3 h  -r 0 -r3 -h  -r2 -r2  -h -r3  0 -r  h -r3  r2 -r2  r3 -h
+	matrix ks kd red green blue 1 center 17
+	string 0 0 red green blue 1 add center 1 16
+	s add center 1 add center 16 0 0 red green blue 1
+}
+{ createcar // takes x,y,w_red,w_green,w_blue,f_red,f_green,f_blue,c_red,c_green,c_blue
+	set frame point
+	dpoints x y 5 5 1 false 6  0 0  350 0  0 100  -300 0  -25 -50  -25 0
+	matrix ks kd .2 .2 .2 1 frame 6
+
+	set x add x 75
+	set r 75
+	set pr 1
+	set dx 5
+	set dy 5
+	set red w_red
+	set green w_green
+	set blue w_blue
+	call createcircle
+	set left center
+	set x add x 200
+	set r 100
+	call createcircle
+	set right center
+	
+	s left right ks kd c_red c_green c_blue 1
+	
+	string 0  0  f_red f_green f_blue 1 frame 6
+	s frame add frame 5 ks kd f_red f_green f_blue 1
+	s left frame ks kd c_red c_green c_blue 1
+	s right add frame 1 ks kd c_red c_green c_blue 1
+}
+
+set x 100
+set y 50
+set w_red 1
+set w_green 0
+set w_blue 0
+set f_red 0
+set f_green 1
+set f_blue 0
+set c_red 0
+set c_green 0
+set c_blue 1
+
+call createcar
+
+
+set x 500
+set y 500
+set w_red 0
+set w_green 1
+set w_blue 0
+set f_red 0
+set f_green 0
+set f_blue 1
+set c_red 1
+set c_green 1
+set c_blue 1
+call createcar
+
+set mybox point
+dpoints 100 100 1 5 5 false 4 0 0 50 0 0 -50 -50 0
+say mybox
+matrix ks kd 1 0 1 1 mybox 4
+
+/*
+set x 500
+set y 500
+set r 500
+set pr 1
+set dx 15
+set dy 7
+set red 1
+set green 1
+set blue 0
+
+call createcircle
+*/
+
+
