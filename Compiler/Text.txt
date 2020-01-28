@@ -1,0 +1,7 @@
+void main int cout < <= > >= == != << >> = + - * / += -= *= /= ++ -- ** ! ; () {} , banana 8 /*Comment*/  "Hello" 'a' 
+void main()
+{
+	int sum;
+	sum = 35 + 400;
+	cout << sum;
+}
