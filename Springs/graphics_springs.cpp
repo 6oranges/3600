@@ -24,11 +24,11 @@ using namespace std;
 // Global Variables
 // Some colors you can use, or make your own and add them
 // here and in graphics.h
-GLdouble redMaterial[] = {0.7, 0.1, 0.2, 1.0};
-GLdouble greenMaterial[] = {0.1, 0.7, 0.4, 1.0};
-GLdouble brightGreenMaterial[] = {0.1, 0.9, 0.1, 1.0};
-GLdouble blueMaterial[] = {0.1, 0.2, 0.7, 1.0};
-GLdouble whiteMaterial[] = {1.0, 1.0, 1.0, 1.0};
+GLdouble redMaterial[] = { 0.7, 0.1, 0.2, 1.0 };
+GLdouble greenMaterial[] = { 0.1, 0.7, 0.4, 1.0 };
+GLdouble brightGreenMaterial[] = { 0.1, 0.9, 0.1, 1.0 };
+GLdouble blueMaterial[] = { 0.1, 0.2, 0.7, 1.0 };
+GLdouble whiteMaterial[] = { 1.0, 1.0, 1.0, 1.0 };
 
 double screen_x = 700;
 double screen_y = 500;
@@ -42,9 +42,9 @@ ParticleSystem PS;
 void DrawCircle(double x1, double y1, double radius)
 {
 	glBegin(GL_POLYGON);
-	for(int i=0; i<32; i++)
+	for (int i = 0; i < 32; i++)
 	{
-		double theta = (double)i/32.0 * 2.0 * 3.1415926;
+		double theta = (double)i / 32.0 * 2.0 * 3.1415926;
 		double x = x1 + radius * cos(theta);
 		double y = y1 + radius * sin(theta);
 		glVertex2d(x, y);
@@ -55,58 +55,58 @@ void DrawCircle(double x1, double y1, double radius)
 void DrawLine(double x1, double y1, double x2, double y2)
 {
 	glBegin(GL_LINES);
-	glVertex2d(x1,y1);
-	glVertex2d(x2,y2);
+	glVertex2d(x1, y1);
+	glVertex2d(x2, y2);
 	glEnd();
 }
 
 void DrawRectangle(double x1, double y1, double x2, double y2)
 {
 	glBegin(GL_QUADS);
-	glVertex2d(x1,y1);
-	glVertex2d(x2,y1);
-	glVertex2d(x2,y2);
-	glVertex2d(x1,y2);
+	glVertex2d(x1, y1);
+	glVertex2d(x2, y1);
+	glVertex2d(x2, y2);
+	glVertex2d(x1, y2);
 	glEnd();
 }
 
 void DrawTriangle(double x1, double y1, double x2, double y2, double x3, double y3)
 {
 	glBegin(GL_TRIANGLES);
-	glVertex2d(x1,y1);
-	glVertex2d(x2,y2);
-	glVertex2d(x3,y3);
+	glVertex2d(x1, y1);
+	glVertex2d(x2, y2);
+	glVertex2d(x3, y3);
 	glEnd();
 }
 
 // Outputs a string of text at the specified location.
-void text_output(double x, double y, char *string)
+void text_output(double x, double y, char* string)
 {
-	void *font = GLUT_BITMAP_9_BY_15;
+	void* font = GLUT_BITMAP_9_BY_15;
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-	
+	glEnable(GL_BLEND);
+
 	int len, i;
 	glRasterPos2d(x, y);
-	len = (int) strlen(string);
-	for (i = 0; i < len; i++) 
+	len = (int)strlen(string);
+	for (i = 0; i < len; i++)
 	{
 		glutBitmapCharacter(font, string[i]);
 	}
 
-    glDisable(GL_BLEND);
+	glDisable(GL_BLEND);
 }
 
-double getDeltaTime(){
+double getDeltaTime() {
 	using namespace std::chrono;
- 	static steady_clock::time_point clock_begin = steady_clock::now();
-  	steady_clock::time_point clock_end = steady_clock::now();
+	static steady_clock::time_point clock_begin = steady_clock::now();
+	steady_clock::time_point clock_end = steady_clock::now();
 
-  	steady_clock::duration time_span = clock_end - clock_begin;
+	steady_clock::duration time_span = clock_end - clock_begin;
 
- 	 double dt = double(time_span.count()) * steady_clock::period::num / steady_clock::period::den;
-	clock_begin=clock_end;
+	double dt = double(time_span.count()) * steady_clock::period::num / steady_clock::period::den;
+	clock_begin = clock_end;
 	return dt;
 }
 
@@ -123,8 +123,15 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3dv(whiteMaterial);
 
-	double DeltaT = 0.1;
+	double DeltaT;
 	DeltaT = getDeltaTime();
+	if (DeltaT > .05) {
+		DeltaT = 0;
+	}
+	else {
+		DeltaT *= speed_m;
+	}
+	
 	//EulerStep(PS, DeltaT);
 	//MidpointStep(PS, DeltaT);
 	RungeKuttaStep(PS, DeltaT);
@@ -133,9 +140,9 @@ void display(void)
 	int NF = PS.GetNumForces();
 
 	// Check Resulting particles for wall collisions
-	for(i=0; i<N; i++)
+	for (i = 0; i < N; i++)
 	{
-		Particle * p = PS.GetParticle(i);
+		Particle* p = PS.GetParticle(i);
 		double radius = p->GetRadius();
 		double x = p->GetPositionx();
 		double y = p->GetPositiony();
@@ -143,28 +150,28 @@ void display(void)
 		double yDir = p->GetDirectiony();
 
 		// bounce off left wall
-		if(x - radius < 0)
+		if (x - radius < 0)
 		{
 			p->SetPositionx(radius);
 			p->SetDirectionx(fabs(xDir));
 		}
 
 		// bounce off right wall
-		if(x + radius > screen_x)
+		if (x + radius > screen_x)
 		{
 			p->SetPositionx(screen_x - radius);
 			p->SetDirectionx(-fabs(xDir));
 		}
 
 		// bounce off bottom wall
-		if(y - radius < 0)
+		if (y - radius < 0)
 		{
 			p->SetPositiony(radius);
 			p->SetDirectiony(fabs(yDir));
 		}
 
 		// bounce off top wall
-		if(y + radius > screen_y)
+		if (y + radius > screen_y)
 		{
 			p->SetPositiony(screen_y - radius);
 			p->SetDirectiony(-fabs(yDir));
@@ -173,28 +180,28 @@ void display(void)
 
 
 	// Draw Spring Forces as edges
-	for(i=0; i<NF; i++)
+	for (i = 0; i < NF; i++)
 	{
-		Force * f = PS.GetForce(i);
-		if(f->Type() == SPRING_FORCE)
+		Force* f = PS.GetForce(i);
+		if (f->Type() == SPRING_FORCE)
 		{
-			SpringForce * sf = (SpringForce*)f;
-			Particle * p1 = sf->GetParticle1();
-			Particle * p2 = sf->GetParticle2();
-			glColor3d(sf->r(),sf->g(),sf->b());
-			DrawLine(p1->GetPositionx(), p1->GetPositiony(),  p2->GetPositionx(), p2->GetPositiony());
+			SpringForce* sf = (SpringForce*)f;
+			Particle* p1 = sf->GetParticle1();
+			Particle* p2 = sf->GetParticle2();
+			glColor3d(sf->r(), sf->g(), sf->b());
+			DrawLine(p1->GetPositionx(), p1->GetPositiony(), p2->GetPositionx(), p2->GetPositiony());
 		}
 	}
 
 	// Draw Particles
-	for(i=0; i<N; i++)
+	for (i = 0; i < N; i++)
 	{
-		Particle * p = PS.GetParticle(i);
+		Particle* p = PS.GetParticle(i);
 		double radius = p->GetRadius();
 
 		double thePos[DIM];
 		p->GetPosition(thePos);
-		if(p->GetAnchored())
+		if (p->GetAnchored())
 			glColor3dv(redMaterial);
 		else
 			glColor3dv(whiteMaterial);
@@ -210,16 +217,16 @@ void display(void)
 // system whenever a key is pressed.
 void keyboard(unsigned char c, int x, int y)
 {
-	switch (c) 
+	switch (c)
 	{
-		case 27: // escape character means to quit the program
-			exit(0);
-			break;
-		case 'b':
-			// do something when 'b' character is hit.
-			break;
-		default:
-			return; // if we don't care, return without glutPostRedisplay()
+	case 27: // escape character means to quit the program
+		exit(0);
+		break;
+	case 'b':
+		// do something when 'b' character is hit.
+		break;
+	default:
+		return; // if we don't care, return without glutPostRedisplay()
 	}
 
 	glutPostRedisplay();
@@ -249,21 +256,21 @@ void reshape(int w, int h)
 // system whenever any mouse button goes up or down.
 void mouse(int mouse_button, int state, int x, int y)
 {
-	if (mouse_button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) 
+	if (mouse_button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
 	}
-	if (mouse_button == GLUT_LEFT_BUTTON && state == GLUT_UP) 
+	if (mouse_button == GLUT_LEFT_BUTTON && state == GLUT_UP)
 	{
 	}
-	if (mouse_button == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN) 
+	if (mouse_button == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN)
 	{
 	}
-	if (mouse_button == GLUT_MIDDLE_BUTTON && state == GLUT_UP) 
+	if (mouse_button == GLUT_MIDDLE_BUTTON && state == GLUT_UP)
 	{
 	}
 	glutPostRedisplay();
 }
-class Parser{
+class Parser {
 public:
 	Parser(istream* fin);
 	Parser(string filename);
@@ -271,164 +278,274 @@ public:
 	void ParseBlock(ParticleSystem& ps);
 private:
 	istream* mFin;
-	map<string,double> mLabels;
-	map<string,string> mBlocks;
-	map<string,vector<double>> mBundles;
+	map<string, double> mLabels;
+	map<string, string> mBlocks;
+	map<string, vector<double>> mBundles;
 	string mBundleIndex;
 	int mBundleValueIndex;
 	vector<Particle*> mParticles;
 
 };
-Parser::Parser(istream* fin): mFin(fin){
-	mLabels["true"]=1;
-	mLabels["false"]=0;
+Parser::Parser(istream* fin) : mFin(fin) {
+	mLabels["true"] = 1;
+	mLabels["false"] = 0;
 }
-double Parser::Value(){
-	if (mBundleIndex!=""){
-		mBundleValueIndex+=1;
-		if (mBundleValueIndex>=mBundles[mBundleIndex].size()){
-			mBundleIndex="";
+double Parser::Value() {
+	if (mBundleIndex != "") {
+		mBundleValueIndex += 1;
+		if (mBundleValueIndex >= mBundles[mBundleIndex].size()) {
+			mBundleIndex = "";
 		}
-		else{
+		else {
 			return mBundles[mBundleIndex][mBundleValueIndex];
 		}
 	}
 	string value;
-	*mFin>>value;
-	if (value == "add" || value=="+"){
-		return Value()+Value();
+	*mFin >> value;
+	if (value == "add" || value == "+") {
+		return Value() + Value();
 	}
-	else if (value == "sub" || value=="-"){
-		return Value()-Value();
+	else if (value == "sub" || value == "-") {
+		return Value() - Value();
 	}
-	else if (value == "mul" || value=="*"){
-		return Value()*Value();
+	else if (value == "mul" || value == "*") {
+		return Value() * Value();
 	}
-	else if (value == "sin"){
+	else if (value == "sin") {
 		return sin(Value());
 	}
-	else if (value == "cos"){
+	else if (value == "cos") {
 		return cos(Value());
 	}
-	else if (value == "atan2"){
-		return atan2(Value(),Value());
+	else if (value == "atan2") {
+		return atan2(Value(), Value());
 	}
-	else if (value == "root"){
+	else if (value == "root") {
 		return sqrt(Value());
 	}
-	else if (mLabels.count(value)>0){
+	else if (mLabels.count(value) > 0) {
 		return mLabels[value];
 	}
-	else if (mBundles.count(value)>0){
-		mBundleValueIndex=0;
+	else if (mBundles.count(value) > 0) {
+		mBundleValueIndex = 0;
 		return mBundles[value][mBundleValueIndex];
 	}
-	else{
+	else {
 		double v;
-		stringstream(value)>>v;
+		stringstream(value) >> v;
 		return v;
 	}
 }
-void Parser::ParseBlock(ParticleSystem& ps){
-	while (*mFin){
+void Parser::ParseBlock(ParticleSystem& ps) {
+	while (*mFin) {
 		string command;
-		*mFin>>command;
-		mLabels["point"]=mParticles.size();
-		if (command=="p"){
-			Particle *p1 = new Particle(Value(),Value(),Value(),Value(),Value(),Value());
+		*mFin >> command;
+		mLabels["point"] = mParticles.size();
+		if (command == "p") {
+			double x, y, dx, dy, r;
+			bool fixed;
+			x = Value();
+			y = Value();
+			dx = Value();
+			dy = Value();
+			r = Value();
+			fixed = Value();
+			Particle* p1 = new Particle(x,y,dx,dy,r,fixed);
 			ps.AddParticle(p1);
 			mParticles.push_back(p1);
 		}
-		else if (command=="s"){
-			ps.AddForce(new SpringForce(mParticles[Value()], mParticles[Value()], Value(), Value(), Value(), Value(), Value()));
+		else if (command == "s") {
+			int p1, p2;
+			double s, d, r, g, b, p;
+			p1 = Value();
+			p2 = Value();
+			s = Value();
+			d = Value();
+			r = Value();
+			g = Value();
+			b = Value();
+			p = Value();
+			ps.AddForce(new SpringForce(mParticles[p1], mParticles[p2],s,d,r,g,b,p));
 		}
-		else if (command=="screen"){
-			screen_x=Value();
-			screen_y=Value();
+		else if (command == "points") {
+			double dx, dy, r;
+			bool fixed;
+			int points;
+			dx = Value();
+			dy = Value();
+			r = Value();
+			fixed = Value();
+			points = Value();
+			for (int i = 0;i < points;i++) {
+				double x, y;
+				x = Value();
+				y = Value();
+				Particle* p1 = new Particle(x, y, dx, dy, r, fixed);
+				ps.AddParticle(p1);
+				mParticles.push_back(p1);
+			}
 		}
-		else if (command=="speed"){
-			speed_m=Value();
+		else if (command == "dpoints") {
+			double dx, dy, r;
+			bool fixed;
+			int points;
+			double x, y;
+			x = Value();
+			y = Value();
+			dx = Value();
+			dy = Value();
+			r = Value();
+			fixed = Value();
+			points = Value();
+			for (int i = 0;i < points;i++) {
+				x += Value();
+				y += Value();
+				Particle* p1 = new Particle(x, y, dx, dy, r, fixed);
+				ps.AddParticle(p1);
+				mParticles.push_back(p1);
+			}
 		}
-		else if (command=="g"){
-			double gravity[DIM] = {Value(), Value()};
-			Force * gf = new GravityForce(gravity, &ps);
+		else if (command == "spoints") {
+			double dx, dy, r;
+			bool fixed;
+			int points;
+			double sx, sy;
+			sx = Value();
+			sy = Value();
+			dx = Value();
+			dy = Value();
+			r = Value();
+			fixed = Value();
+			points = Value();
+			for (int i = 0;i < points;i++) {
+				double x, y;
+				x = Value();
+				y = Value();
+				Particle* p1 = new Particle(x+sx, y+sy, dx, dy, r, fixed);
+				ps.AddParticle(p1);
+				mParticles.push_back(p1);
+			}
+		}
+		else if (command == "string") {
+			double s, d, r, g, b, p;
+			int start, points;
+			s = Value();
+			d = Value();
+			r = Value();
+			g = Value();
+			b = Value();
+			p = Value();
+			start = Value();
+			points = Value();
+			for (int i = 1;i < points;i++) {
+				ps.AddForce(new SpringForce(mParticles[start+i], mParticles[start+i-1], s, d, r, g, b, p));
+			}
+		}
+		else if (command == "matrix") {
+			double s, d, r, g, b, p;
+			int start, points;
+			s = Value();
+			d = Value();
+			r = Value();
+			g = Value();
+			b = Value();
+			p = Value();
+			start = Value();
+			points = Value();
+			for (int i = 0;i < points;i++) {
+				for (int j = i+1;j < points;j++) {
+					ps.AddForce(new SpringForce(mParticles[start + i], mParticles[start + j], s, d, r, g, b, p));
+				}
+			}
+		}
+		else if (command == "screen") {
+			screen_x = Value();
+			screen_y = Value();
+		}
+		else if (command == "speed") {
+			speed_m = Value();
+		}
+		else if (command == "g") {
+			double gravity[DIM] = { Value(), Value() };
+			Force* gf = new GravityForce(gravity, &ps);
 			ps.AddForce(gf);
 		}
-		else if (command=="set"||command=="="){
+		else if (command == "set" || command == "=") {
 			string label;
-			*mFin>>label;
-			mLabels[label]=Value();
+			*mFin >> label;
+			mLabels[label] = Value();
 		}
-		else if (command=="{"){
-			char v=0;
+		else if (command == "{") {
+			char v = 0;
 			string label;
-			*mFin>>label;
+			*mFin >> label;
 			stringstream ss;
-			while (*mFin&&v!='}'){
-				if (v){
-					ss<<v;
+			while (*mFin && v != '}') {
+				if (v) {
+					ss << v;
 				}
 				(*mFin).get(v);
 			}
-			mBlocks[label]=ss.str();
+			mBlocks[label] = ss.str();
 		}
-		else if (command=="/*"){
+		else if (command == "/*") {
 			string v;
-			while (*mFin&&v!="*/"){
-				*mFin>>v;
+			while (*mFin && v != "*/") {
+				*mFin >> v;
 			}
 		}
-		else if (command=="//"){
-			char v=0;
-			while (*mFin&&v!='\n'){
+		else if (command == "//") {
+			char v = 0;
+			while (*mFin && v != '\n') {
 				(*mFin).get(v);
 			}
 		}
-		else if (command=="bundle"){
+		else if (command == "bundle") {
 			string label;
-			*mFin>>label;
+			*mFin >> label;
 			vector<double> b;
-			int length=Value();
-			for (int i=0;i<length;i++){
+			int length = Value();
+			for (int i = 0;i < length;i++) {
 				b.push_back(Value());
 			}
-			mBundles[label]=b;
+			mBundles[label] = b;
 		}
-		else if (command=="call"){
-			
+		else if (command == "call") {
+
 			string label;
-			*mFin>>label;
-			stringstream ss=stringstream(mBlocks[label]); // new stream
-			istream* nFin=&ss; // Location new stream
-			istream* t=mFin; // Location old stream
-			mFin=nFin; // Change location
+			*mFin >> label;
+			stringstream ss = stringstream(mBlocks[label]); // new stream
+			istream* nFin = &ss; // Location new stream
+			istream* t = mFin; // Location old stream
+			mFin = nFin; // Change location
 			ParseBlock(ps); // Call
-			mFin=t; // Change back
+			mFin = t; // Change back
 		}
-		else if (command=="say"){
+		else if (command == "say") {
 			string label;
-			*mFin>>label;
-			cout<<label<<":"<<mLabels[label]<<endl;
+			*mFin >> label;
+			cout << label << ":" << mLabels[label] << endl;
 		}
-		else if (command=="d"){
-			Force * df = new DragForce(Value(), &PS);
+		else if (command == "d") {
+			Force* df = new DragForce(Value(), &PS);
 			PS.AddForce(df);
 		}
 		else {
-			cout<<"No entiendo: "<<command<<endl;
+			cout << "No entiendo: " << command << endl;
 		}
+		*mFin >> ws>>ws>>ws>>ws;
 	}
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	string filename;
-	if (argc>1){
-		filename=argv[1];
+	if (argc > 1) {
+		filename = argv[1];
 	}
-	else{
-		cout<<"Please enter filename: ";
-		cin>>filename;
+	else {
+		cout << "Please enter filename: ";
+		cin >> filename;
 	}
 	ifstream fin;
 	fin.open(filename);
@@ -441,12 +558,12 @@ int main(int argc, char **argv)
 	glutInitWindowPosition(50, 50);
 
 	int fullscreen = 0;
-	if (fullscreen) 
+	if (fullscreen)
 	{
 		glutGameModeString("800x600:32");
 		glutEnterGameMode();
-	} 
-	else 
+	}
+	else
 	{
 		glutCreateWindow("Shapes");
 	}
@@ -456,8 +573,8 @@ int main(int argc, char **argv)
 	glutReshapeFunc(reshape);
 	glutMouseFunc(mouse);
 
-	glClearColor(.3,.3,.3,0);	
-	
+	glClearColor(.3, .3, .3, 0);
+
 
 	glutMainLoop();
 
