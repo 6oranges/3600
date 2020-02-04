@@ -1,4 +1,5 @@
 #include "Scanner.h"
+#include "Debug.h"
 int main() {
 	ScannerClass scanner("Text.txt");
 	while (true) {

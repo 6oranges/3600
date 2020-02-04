@@ -1,0 +1,25 @@
+# default target
+all: product
+
+# target: dependencies
+# <TAB>command to build target from dependencies
+product: forces.o graphics_springs.o particle.o vector.o
+	g++ -std=c++11 -o product forces.o graphics_springs.o particle.o vector.o -lGL -lGLU -lglut
+
+forces.o: forces.cpp forces.h
+	g++ -std=c++11 -c forces.cpp
+
+graphics_springs.o: graphics_springs.cpp
+	g++ -std=c++11 -c graphics_springs.cpp
+
+particle.o: particle.cpp particle.h
+	g++ -std=c++11 -c particle.cpp
+
+vector.o: vector.cpp vector.h
+	g++ -std=c++11 -c vector.cpp
+
+run: product
+	./product
+
+clean:
+	-rm -f product *.o

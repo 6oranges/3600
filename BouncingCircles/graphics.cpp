@@ -15,11 +15,7 @@
 #include <cstring>
 #include <stdlib.h>
 #include <vector>
-#if WIN32
-#include "glut.h"
-#else // Linux
-#include <GL/freeglut.h>
-#endif
+#include "../pglut.h"
 
 #include <time.h> 
 // Global Variables (Only what you need!)

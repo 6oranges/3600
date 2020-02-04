@@ -29,15 +29,15 @@ Definitions
 */
 
 // Start code
-set ks 5
+set ks 1
 set kd .5
 screen 1000 1000
 
 
-// d .0001
-g 0.0 -.5
-dt .016
-
+// d -.05
+ g 0.0 -.5
+// dt .016
+speed 20
 { createcircle // takes x,y,r,pr,dx,dy,red,green,blue returns center
 	set h mul r .5
 	set r2 mul mul 1.41421356237 r .5
@@ -48,17 +48,17 @@ dt .016
 	set -r3 sub 0 r3
 	set center point
 	spoints x y dx dy pr false 17  0 0   r 0  r3 h  r2 r2  h r3  0 r  -h r3  -r2 r2  -r3 h  -r 0 -r3 -h  -r2 -r2  -h -r3  0 -r  h -r3  r2 -r2  r3 -h
-	matrix ks kd red green blue 1 center 17
+	matrix ks kd g g g 1 center 17
 	string 0 0 red green blue 1 add center 1 16
 	s add center 1 add center 16 0 0 red green blue 1
 }
 { createcar // takes x,y,w_red,w_green,w_blue,f_red,f_green,f_blue,c_red,c_green,c_blue
 	set frame point
 	dpoints x y 5 5 1 false 6  0 0  350 0  0 100  -300 0  -25 -50  -25 0
-	matrix ks kd .2 .2 .2 1 frame 6
+	matrix ks kd g g g 1 frame 6
 
 	set x add x 75
-	set r 75
+	set r 40
 	set pr 1
 	set dx 5
 	set dy 5
@@ -68,7 +68,7 @@ dt .016
 	call createcircle
 	set left center
 	set x add x 200
-	set r 100
+	set r 40
 	call createcircle
 	set right center
 	
@@ -79,6 +79,34 @@ dt .016
 	s left frame ks kd c_red c_green c_blue 1
 	s right add frame 1 ks kd c_red c_green c_blue 1
 }
+{ rain
+	set x add x 5
+	set y add sub rand .5 y
+	p x y sub rand .5 sub rand .5 3 false
+}
+set g div 80 255 // 76
+set x 101
+set y 102
+set amount 103
+p x y sub rand .5 sub rand .5 3 true
+rep rain amount
+p add x 5 y sub rand .5 sub rand .5 3 true
+string 10  .5  1 1 0  1 sub point add amount 2 add amount 2
+/*
+set g div 80 255 // 76
+set x 100
+set y 100
+set amount 100
+p x y sub rand .5 sub rand .5 1 true
+rep rain amount
+string 10  .5  1 1 0  1 sub point add amount 1 amount
+
+set g div 80 255 // 76
+set x 100
+set y 100
+set amount 100
+rep rain amount
+string 10  .5  1 1 0  1 sub point amount amount
 
 set x 100
 set y 50
@@ -100,19 +128,26 @@ set y 500
 set w_red 0
 set w_green 1
 set w_blue 0
-set f_red 0
-set f_green 0
-set f_blue 1
+set f_red 1
+set f_green .5
+set f_blue 0
 set c_red 1
 set c_green 1
 set c_blue 1
 call createcar
-
-set mybox point
-dpoints 100 100 1 5 5 false 4 0 0 50 0 0 -50 -50 0
-say mybox
-matrix ks kd 1 0 1 1 mybox 4
-
+{ square
+	set mybox point
+	dpoints x y
+		mul sub rand .5 60
+		mul sub rand .5 60 
+		4 false 4 0 0 50 0 0 -50 -50 0
+	say mybox
+	matrix ks kd 1 0 1 1 mybox 4
+}
+set x 100
+set y 100
+rep square 10
+*/
 /*
 set x 500
 set y 500
@@ -126,5 +161,43 @@ set blue 0
 
 call createcircle
 */
+bundle orange 3 1 .5 0
+say orange
+set red orange
+set green rand
+set blue rand
+say red
+say green
+say blue
+call createcircle
+set x add x 10
+call createcircle
+set x add x 10
+call createcircle
+set x add x 10
+call createcircle
+set x add x 10
+call createcircle
+set x add x 10
 
 
+set x 100
+set y 100
+set r 20
+set pr 1
+set dx 0
+set dy 0
+set red 1
+set green .75
+set blue 0
+call createcircle
+set neck point
+p x sub y add r 10 0 0 1 false
+s center neck ks kd 0 0 1 1
+say barbaquesauzse
+
+
+p add x 5 sub y add r 10 0 0 1 false
+s sub point 1 neck ks kd 0 0 1 1
+p sub x 5 sub y add r 10 0 0 1 false
+s sub point 1 neck ks kd 0 0 1 1

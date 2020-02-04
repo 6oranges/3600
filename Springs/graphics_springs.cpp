@@ -15,7 +15,7 @@
 #include <chrono>
 #include <map>
 using namespace std;
-#include "glut.h"
+#include "../pglut.h"
 #include "graphics.h"
 #include "particle.h"
 #include "forces.h"
@@ -33,6 +33,10 @@ GLdouble whiteMaterial[] = { 1.0, 1.0, 1.0, 1.0 };
 double screen_x = 700;
 double screen_y = 500;
 double speed_m = 1;
+bool mousedown=false;
+int mousex=0;
+int mousey=0;
+int pindex=-1;
 // The particle system.
 ParticleSystem PS;
 
@@ -131,6 +135,7 @@ void display(void)
 	else {
 		DeltaT *= speed_m;
 	}
+	DeltaT=speed_m/60;
 	
 	//EulerStep(PS, DeltaT);
 	//MidpointStep(PS, DeltaT);
@@ -203,9 +208,18 @@ void display(void)
 		p->GetPosition(thePos);
 		if (p->GetAnchored())
 			glColor3dv(redMaterial);
+			if (mousedown&&pindex==i){
+				p->SetPositionx(mousex);
+				p->SetPositiony(mousey);
+			}
 		else
 			glColor3dv(whiteMaterial);
+			if (mousedown&&pindex==i){
+				p->SetDirectionx(p->GetDirectionx()+(mousex-thePos[0])*.2);
+				p->SetDirectiony(p->GetDirectiony()+(mousey-thePos[1])*.2);
+			}
 		DrawCircle(thePos[0], thePos[1], radius);
+		
 	}
 
 	glutSwapBuffers();
@@ -251,16 +265,38 @@ void reshape(int w, int h)
 	glMatrixMode(GL_MODELVIEW);
 
 }
-
+void motion(int x, int y)
+{
+	mousex=x;
+	mousey=screen_y-y;
+}
 // This callback function gets called by the Glut
 // system whenever any mouse button goes up or down.
 void mouse(int mouse_button, int state, int x, int y)
 {
+	mousex=x;
+	mousey=screen_y-y;
 	if (mouse_button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 	{
+		mousedown=true;
+		int ld=10000000;
+		pindex=-1;
+		for (int i = 0; i < PS.GetNumParticles(); i++)
+		{
+			Particle* p = PS.GetParticle(i);
+
+			double thePos[DIM];
+			p->GetPosition(thePos);
+			double d2=(mousex-thePos[0])*(mousex-thePos[0])+(mousey-thePos[1])*(mousey-thePos[1]);
+			if (d2<ld){
+				ld=d2;
+				pindex=i;
+			}
+		}
 	}
 	if (mouse_button == GLUT_LEFT_BUTTON && state == GLUT_UP)
 	{
+		mousedown=false;
 	}
 	if (mouse_button == GLUT_MIDDLE_BUTTON && state == GLUT_DOWN)
 	{
@@ -311,6 +347,9 @@ double Parser::Value() {
 	else if (value == "mul" || value == "*") {
 		return Value() * Value();
 	}
+	else if (value == "div" || value == "/") {
+		return Value() / Value();
+	}
 	else if (value == "sin") {
 		return sin(Value());
 	}
@@ -322,6 +361,9 @@ double Parser::Value() {
 	}
 	else if (value == "root") {
 		return sqrt(Value());
+	}
+	else if (value == "rand") {
+		return  (double) rand() / (RAND_MAX + 1.0);
 	}
 	else if (mLabels.count(value) > 0) {
 		return mLabels[value];
@@ -520,20 +562,51 @@ void Parser::ParseBlock(ParticleSystem& ps) {
 			mFin = nFin; // Change location
 			ParseBlock(ps); // Call
 			mFin = t; // Change back
+		}else if (command=="rep"){
+			istream* t = mFin; // Location old stream
+			string label;
+			int amount;
+			*mFin >> label;
+			amount = Value();
+			
+			
+			
+			for (int x=0;x<amount;x++){
+				stringstream ss = stringstream(mBlocks[label]); // new stream
+				istream* nFin = &ss; // Location new stream
+				mFin = nFin; // Change location
+				ParseBlock(ps); // Call
+			}
+			
+			mFin = t; // Change back
 		}
 		else if (command == "say") {
 			string label;
 			*mFin >> label;
-			cout << label << ":" << mLabels[label] << endl;
+			if (mLabels.count(label)>0){
+				cout << label << ":" << mLabels[label] << endl;
+			}
+			else if (mBundles.count(label)>0){
+				cout << label << ":<";
+				if (mBundles[label].size()>0){
+					cout << mBundles[label][0];
+					for (int i=1;i<mBundles[label].size();i++){
+						cout << ", " << mBundles[label][i];
+					}
+				}
+				cout << ">" << endl;
+			}
+			
 		}
 		else if (command == "d") {
 			Force* df = new DragForce(Value(), &PS);
 			PS.AddForce(df);
 		}
 		else {
-			cout << "No entiendo: " << command << endl;
+			if (command.size()>0){
+				cout << "No entiendo: " << command << endl;
+			}
 		}
-		*mFin >> ws>>ws>>ws>>ws;
 	}
 }
 
@@ -567,14 +640,13 @@ int main(int argc, char** argv)
 	{
 		glutCreateWindow("Shapes");
 	}
-
 	glutDisplayFunc(display);
+	glutMotionFunc(motion);
 	glutKeyboardFunc(keyboard);
 	glutReshapeFunc(reshape);
 	glutMouseFunc(mouse);
 
 	glClearColor(.3, .3, .3, 0);
-
 
 	glutMainLoop();
 

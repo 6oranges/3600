@@ -1,9 +1,11 @@
 #include "Scanner.h"
 #include "StateMachine.h"
 #include <sstream>
+#include "debug.h"
 ScannerClass::ScannerClass(std::string filename)
 {
 	mFin.open(filename, std::ifstream::in);
+	MSG("Instantiating ScannerClass with filename: "<<filename);
 	mLineNumber = 1;
 	mColumn = 0;
 	if (!mFin.good()) {
