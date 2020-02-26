@@ -14,9 +14,9 @@
 #include <cmath>
 #include <cstring>
 #include "graphics.h"
-#include "maze.h"
+#include "terrain.h"
 #include "../pglut.h"
-#include "rat.h"
+#include "glider.h"
 #include <chrono>
 // Global Variables (Only what you need!)
 double screen_x = 700;
@@ -25,12 +25,53 @@ struct Input
 {
 	bool forward=false,left=false,right=false;
 };
-viewtype current_view = top_view;
-Maze gMaze(40,40);
-Rat gRat;
+viewtype current_view = perspective_view;
+
+Glider gGlider;
 Input gInput;
 double gTheta=45*3.141592653589793238/180;
 double timet=0;
+double myFunction(double x, double y){
+	x=x/10;
+	y=y/10;
+	double a= .79045*sin((x)/(.653)+.3523)+.6543*sin((y)/(.853)+.5623)+.5441*sin((x)/(.553)+.9897)+.8443*sin((y)/(.553)+.8923)+.7*sin(x+.436)*sin(y)+.1*sin(x)*sin(y);
+	return 3*a;
+	//return 2*sin(0.4*y)+0.75+1.5*cos(0.3*x)+4*sin(0.2*x)*cos(0.3*y)+6*sin(0.11*x)*cos(0.03*y);
+	//return y*x+5*x+3*y+x*x;
+}
+double myRed(double x, double y, double z){
+	return (1-((z-3)/16+.5))/2;//(sin(x/2)*cos(y)*sin(x*2+.2)+1)/2;
+}
+double myGreen(double x, double y, double z){
+	return (z-3)/16+.5;
+}
+double myBlue(double x, double y, double z){
+	return 0;
+}
+double myOpaque(double x, double y, double z){
+	return 1;
+}
+double wFunction(double x, double y){
+	x=x/5;
+	y=y/5;
+	return sin(gTheta*3)+.79045*sin((x+gTheta*4)/(.653)+.3523)+.6543*sin((y+gTheta*8)/(.853)+.5623)+.5441*sin((x)/(.553)+.9897)+.8443*sin((y)/(.553)+.8923)+.7*sin(x+.436)*sin(y)+.1*sin(x)*sin(y)+3;
+	//return 2*sin(0.4*y)+0.75+1.5*cos(0.3*x)+4*sin(0.2*x)*cos(0.3*y)+6*sin(0.11*x)*cos(0.03*y);
+}
+double wRed(double x, double y, double z){
+	return (z-3)/16+.5+sin(x+6*gTheta)*cos(y+9*gTheta);
+}
+double wGreen(double x, double y, double z){
+	return (z-3)/16+.5;
+}
+double wBlue(double x, double y, double z){
+	return 1;
+}
+double wAlpha(double x, double y, double z){
+	return .5;
+}
+Terrain gTerrain(myFunction,myRed,myGreen,myBlue,myOpaque);
+Terrain gWater(wFunction,wRed,wGreen,wBlue,wAlpha);
+double WIDTH=100,HEIGHT=100;
 // 
 // Functions that draw basic primitives
 //
@@ -112,23 +153,35 @@ double getDeltaTime() {
 	clock_begin = clock_end;
 	return dt;
 }
+double height(){
+	return sin(gTheta*3)*4;
+}
 //
 // GLUT callback functions
 //
 
 // This callback function gets called by the Glut
 // system whenever it decides things need to be redrawn.
+double max(double x,double y){
+	if (x>y){
+		return x;
+	}
+	else{
+		return y;
+	}
+}
 void display(void)
 {
+	glClearColor(0,.7,.9,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	double h = height();
 	if(current_view == perspective_view)
 	{
 		glEnable(GL_DEPTH_TEST);
 		glLoadIdentity();
-		double cx=gMaze.GetWidth()/2;
-		double cy=gMaze.GetHeight()/2;
-		gluLookAt(cx*(1+cos(gTheta)),cy*(1+sin(gTheta)),10,  cx,cy,0,  0,0,1);
+		double cx=gGlider.GetX();
+		double cy=gGlider.GetY();
+		gluLookAt(cx+WIDTH*cos(gTheta),cy+HEIGHT*sin(gTheta),gTerrain.GetZ(cx,cy)+50,  cx,cy,gTerrain.GetZ(cx,cy),  0,0,1);
 	}
 	else if(current_view == top_view)
 	{
@@ -139,39 +192,55 @@ void display(void)
 	{
 		glEnable(GL_DEPTH_TEST);
 		glLoadIdentity();
-		double z_level = (sin(gTheta*4)+1)/2;
-		double x = gRat.GetX();
-		double y = gRat.GetY();
-		double dx = gRat.GetDX();
-		double dy = gRat.GetDY();
+		
+		double x = gGlider.GetX();
+		double y = gGlider.GetY();
+		double z_level = max(gTerrain.GetZ(x,y),gWater.GetZ(x,y))+1;
+		double dx = gGlider.GetDX()*2;
+		double dy = gGlider.GetDY()*2;
 		double at_x = x + dx;
 		double at_y = y + dy;
-		double at_z = z_level;
+		double at_z =max(gTerrain.GetZ(at_x,at_y),gWater.GetZ(at_x,at_y))+1-.1;
 		gluLookAt(x,y,z_level,  at_x, at_y, at_z,  0,0,1);
 	}
+	
 	double dt=getDeltaTime();
-	//timet+=dt;
 	gTheta+=dt/5;
-	if (timet>5){
-		timet=0;
-		gMaze.ReplaceWalls();
-		gMaze.RemoveWalls();
-	}
 	if (gInput.left){
-		gRat.TurnLeft(dt);
+		gGlider.TurnLeft(dt);
 	}
 	if (gInput.right){
-		gRat.TurnRight(dt);
+		gGlider.TurnRight(dt);
 	}
 	if (gInput.forward){
-		gRat.ScurryForward(dt);
+		gGlider.ScurryForward(dt);
 	}
 	glColor3ub(100,100,255);
 	glColor3d(0, 0, 0);
-	gMaze.Draw();
-	glColor3d(0, 1, 0);
-	gRat.Draw();
+	int x=gGlider.GetX();
+	int y=gGlider.GetY();
+	double c =5;
+	//gTerrain.DrawDecending(x-50-c,y-50-c,x+50-c,y+50-c,50,50,10,10);
+	//gTerrain.DrawDecending(x-500-c,y-500-c,x+500-c,y+500-c,25,25,25,25);
+	gTerrain.DrawUniform(x-100-c,y-100-c,x+100-c,y+100-c,100,100);
+	glColor3d(0, 1, .5);
+	gGlider.Draw();
 
+	
+	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4d(.1,.5,1,.5);
+	gWater.DrawUniform(x-100-c,y-100-c,x+100-c,y+100-c,100,100);
+	
+	/*glBegin(GL_QUADS);
+	glVertex3d(x-100,y-100,h);
+	glVertex3d(x+100,y-100,h);
+	glVertex3d(x+100,y+100,h);
+	glVertex3d(x-100,y+100,h);
+
+	glEnd();
+*/
 	glutSwapBuffers();
 	glutPostRedisplay();
 }
@@ -183,8 +252,8 @@ void SetTopView(int w, int h)
 	glLoadIdentity();
 	double world_margin_x = 0.5;
 	double world_margin_y = 0.5;
-	gluOrtho2D(-world_margin_x, gMaze.GetWidth()+world_margin_x, 
-		-world_margin_y, gMaze.GetHeight()+world_margin_y);
+	gluOrtho2D(-world_margin_x, WIDTH+world_margin_x, 
+		-world_margin_y, HEIGHT+world_margin_y);
 	glMatrixMode(GL_MODELVIEW);
 }
 
@@ -329,8 +398,7 @@ int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
 	srand(time(NULL));
-	gMaze.RemoveWalls();
-	gRat=Rat(.3,90,2,180,&gMaze);
+	gGlider=Glider(.3,90,10,90);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 	glutInitWindowSize(screen_x, screen_y);
 	glutInitWindowPosition(50, 50);

@@ -204,6 +204,16 @@ void display(void)
 				double ny1 = ypos[i] + dy[i];
 				double nx2 = xpos[j] + dx[j];
 				double ny2 = ypos[j] + dy[j];
+				double tr=colorr[i];
+				double tg=colorg[i];
+				double tb=colorb[i];
+				colorr[i]=colorr[j];
+				colorg[i]=colorg[j];
+				colorb[i]=colorb[j];
+				colorr[j]=tr;
+				colorg[j]=tg;
+				colorb[j]=tb;
+
 				collide(nx1, ny1, radius[i], dx[i], dy[i], nx2, ny2, radius[j], dx[j], dy[j]);
 				//xpos[i] -= dx[i];
 				//ypos[i] -= dy[i];
@@ -342,7 +352,7 @@ void InitializeMyStuff()
 int main(int argc, char **argv)
 {
 	srand(time(NULL));
-	for (int i = 0;i < 10;i++) {
+	for (int i = 0;i < 5;i++) {
 		dx.push_back(0);
 		dy.push_back(0);
 		radius.push_back(0);

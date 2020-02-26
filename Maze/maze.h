@@ -1,8 +1,5 @@
 #pragma once
-
-const int WIDTH = 16;
-const int HEIGHT =15;
-
+#include <vector>
 struct Cell
 {
 	Cell();
@@ -14,11 +11,19 @@ struct Cell
 class Maze
 {
 public:
-	Maze();
+	Maze(int width, int height);
 	void RemoveWalls();
-	void RemoveWallsR(int i, int j);
+	void ReplaceWalls();
+	void RemoveWallsRB(int i, int j);
+	void RemoveWallsHAK();
 	void Draw();
+	bool IsSafe(double x, double y, double r); // Assuming 1x1 cells and translated already
+	int GetWidth(){return mWidth;}
+	int GetHeight(){return mHeight;}
+	int GetStartCell();
+	
 
 private:
-	Cell cells[WIDTH][HEIGHT];
+	std::vector<std::vector<Cell>> mCells;
+	int mWidth, mHeight, mStart, mEnd;
 };

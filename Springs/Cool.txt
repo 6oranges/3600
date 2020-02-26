@@ -92,7 +92,7 @@ p x y sub rand .5 sub rand .5 3 true
 rep rain amount
 p add x 5 y sub rand .5 sub rand .5 3 true
 string 10  .5  1 1 0  1 sub point add amount 2 add amount 2
-/*
+
 set g div 80 255 // 76
 set x 100
 set y 100
@@ -147,7 +147,7 @@ call createcar
 set x 100
 set y 100
 rep square 10
-*/
+
 /*
 set x 500
 set y 500
