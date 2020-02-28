@@ -59,3 +59,10 @@ TokenClass ScannerClass::GetNextToken() {
 		return tc;
 	}
 }
+TokenClass ScannerClass::PeekNextToken(){
+	int p = mFin.tellg();
+	TokenClass tc = GetNextToken();
+	if(!mFin) // if we triggered EOF, then seekg doesn't work,
+		mFin.clear();// unless we first clear()
+	mFin.seekg(p);
+}

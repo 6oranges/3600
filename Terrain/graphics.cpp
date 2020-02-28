@@ -31,19 +31,32 @@ Glider gGlider;
 Input gInput;
 double gTheta=45*3.141592653589793238/180;
 double timet=0;
+double max(double x,double y){
+	if (x>y){
+		return x;
+	}
+	else{
+		return y;
+	}
+}
 double myFunction(double x, double y){
 	x=x/10;
 	y=y/10;
-	double a= .79045*sin((x)/(.653)+.3523)+.6543*sin((y)/(.853)+.5623)+.5441*sin((x)/(.553)+.9897)+.8443*sin((y)/(.553)+.8923)+.7*sin(x+.436)*sin(y)+.1*sin(x)*sin(y);
+	double a= sin(x/10)*cos(y/15)*10+.79045*sin((x)/(.653)+.3523)+.6543*sin((y)/(.853)+.5623)+.5441*sin((x)/(.553)+.9897)+.8443*sin((y)/(.553)+.8923)+.7*sin(x+.436)*sin(y)+.1*sin(x)*sin(y);
 	return 3*a;
 	//return 2*sin(0.4*y)+0.75+1.5*cos(0.3*x)+4*sin(0.2*x)*cos(0.3*y)+6*sin(0.11*x)*cos(0.03*y);
 	//return y*x+5*x+3*y+x*x;
 }
+double mySand(double x, double y, double z){
+	x=x/5;
+	y=y/5;
+	return (sin(x/10)*cos(y/10)*sin(x+y/3)*cos(.2+x/7+y)+1)/2;
+}
 double myRed(double x, double y, double z){
-	return (1-((z-3)/16+.5))/2;//(sin(x/2)*cos(y)*sin(x*2+.2)+1)/2;
+	return (1-((z-3)/16+.5))/2+mySand(x,y,z)/2;//(sin(x/2)*cos(y)*sin(x*2+.2)+1)/2;
 }
 double myGreen(double x, double y, double z){
-	return (z-3)/16+.5;
+	return -max(-((z-3)/16+.75),-1)-mySand(x,y,z)/4*2;
 }
 double myBlue(double x, double y, double z){
 	return 0;
@@ -61,7 +74,7 @@ double wRed(double x, double y, double z){
 	return (z-3)/16+.5+sin(x+6*gTheta)*cos(y+9*gTheta);
 }
 double wGreen(double x, double y, double z){
-	return (z-3)/16+.5;
+	return wRed(x,y,z);
 }
 double wBlue(double x, double y, double z){
 	return 1;
@@ -71,7 +84,7 @@ double wAlpha(double x, double y, double z){
 }
 Terrain gTerrain(myFunction,myRed,myGreen,myBlue,myOpaque);
 Terrain gWater(wFunction,wRed,wGreen,wBlue,wAlpha);
-double WIDTH=100,HEIGHT=100;
+double WIDTH=300,HEIGHT=300;
 // 
 // Functions that draw basic primitives
 //
@@ -162,14 +175,7 @@ double height(){
 
 // This callback function gets called by the Glut
 // system whenever it decides things need to be redrawn.
-double max(double x,double y){
-	if (x>y){
-		return x;
-	}
-	else{
-		return y;
-	}
-}
+
 void display(void)
 {
 	glClearColor(0,.7,.9,0);
@@ -181,7 +187,7 @@ void display(void)
 		glLoadIdentity();
 		double cx=gGlider.GetX();
 		double cy=gGlider.GetY();
-		gluLookAt(cx+WIDTH*cos(gTheta),cy+HEIGHT*sin(gTheta),gTerrain.GetZ(cx,cy)+50,  cx,cy,gTerrain.GetZ(cx,cy),  0,0,1);
+		gluLookAt(cx+WIDTH*cos(gTheta),cy+HEIGHT*sin(gTheta),gTerrain.GetZ(cx,cy)+150,  cx,cy,gTerrain.GetZ(cx,cy),  0,0,1);
 	}
 	else if(current_view == top_view)
 	{
@@ -219,10 +225,14 @@ void display(void)
 	glColor3d(0, 0, 0);
 	int x=gGlider.GetX();
 	int y=gGlider.GetY();
-	double c =5;
+	
+	const double s=300;//Size of single segment
+	const double d=5; // root of segments
+	const double c =0;//s/d; // offset
+	const double r=50; // triangles in center segment
 	//gTerrain.DrawDecending(x-50-c,y-50-c,x+50-c,y+50-c,50,50,10,10);
-	//gTerrain.DrawDecending(x-500-c,y-500-c,x+500-c,y+500-c,25,25,25,25);
-	gTerrain.DrawUniform(x-100-c,y-100-c,x+100-c,y+100-c,100,100);
+	gTerrain.DrawDecending(x-s-c,y-s-c,x+s-c,y+s-c,r,r,d,d);
+	//gTerrain.DrawUniform(x-100-c,y-100-c,x+100-c,y+100-c,100,100);
 	glColor3d(0, 1, .5);
 	gGlider.Draw();
 
@@ -231,7 +241,8 @@ void display(void)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4d(.1,.5,1,.5);
-	gWater.DrawUniform(x-100-c,y-100-c,x+100-c,y+100-c,100,100);
+	gWater.DrawDecending(x-s-c,y-s-c,x+s-c,y+s-c,r,r,d,d);
+	//gWater.DrawUniform(x-100-c,y-100-c,x+100-c,y+100-c,100,100);
 	
 	/*glBegin(GL_QUADS);
 	glVertex3d(x-100,y-100,h);

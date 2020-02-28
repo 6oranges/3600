@@ -6,6 +6,7 @@ public:
 	ScannerClass(std::string filename);
 	~ScannerClass();
 	TokenClass GetNextToken();
+	TokenClass PeekNextToken();
 	int GetLineNumber();
 	int GetColumn();
 private:
