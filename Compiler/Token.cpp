@@ -9,6 +9,7 @@ TokenClass::TokenClass()
 TokenClass::TokenClass(TokenType type, const std::string& lexeme) 
 	:mType(type),mLexeme(lexeme)
 {
+	MSG("RECIEVING:"<<TokenClass::GetTokenTypeName(type));
 
 }
 
@@ -25,6 +26,15 @@ void TokenClass::CheckReserved() {
 		}
 		if (mLexeme == "cout") {
 			mType = COUT_TOKEN;
+		}
+		if (mLexeme == "if") {
+			mType = IF_TOKEN;
+		}
+		if (mLexeme == "else") {
+			mType = ELSE_TOKEN;
+		}
+		if (mLexeme == "while") {
+			mType = WHILE_TOKEN;
 		}
 	}
 	else {

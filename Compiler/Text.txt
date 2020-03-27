@@ -2,6 +2,26 @@
 void main()
 {
 	int sum;
-	sum = 35 + 400;
+	int j;
+	int i;
+	j=1;
+	cout<<(1+2)*3+4*2;
+	while (i<10){
+		i=i+1;
+		cout<<i;
+		if(i==2&&j==0||i==8){
+			cout<<100;
+		}
+		else if(i==3||i==5){
+			cout<<4000;
+		}
+		else{
+			cout<<42;
+		}
+	}
+	{}
+		cout<<1;
+	
+	sum = 35/7+4 + 400/5;
 	cout << sum;
 }

@@ -55,14 +55,22 @@ TokenClass ScannerClass::GetNextToken() {
 	}
 	else {
 		TokenClass tc = TokenClass(tt, lexeme.str());
+		MSG(tc<<" "<<TokenClass::GetTokenTypeName(tt));
 		tc.CheckReserved();
+		MSG(tc<<" "<<TokenClass::GetTokenTypeName(tt));
 		return tc;
 	}
 }
 TokenClass ScannerClass::PeekNextToken(){
 	int p = mFin.tellg();
+	int l=mLineNumber;
+	int c=mColumn;
 	TokenClass tc = GetNextToken();
 	if(!mFin) // if we triggered EOF, then seekg doesn't work,
 		mFin.clear();// unless we first clear()
 	mFin.seekg(p);
+	mLineNumber=l;
+	mColumn=c;
+	MSG("Peeking Token"<<tc<<" With restored position "<<p);
+	return tc;
 }

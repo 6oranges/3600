@@ -1,25 +1,30 @@
 #include "Symbol.h"
 #include "Scanner.h"
+#include "Node.h"
 class ParserClass{
     public:
         ParserClass(ScannerClass* sc, SymbolTableClass* stc);
-        void Start();
+        StartNode* Start();
     private:
         TokenClass Match(TokenType expectedType);
-        void Program();
-        void Block();
-        void StatementGroup();
-        bool Statement();
-        void DeclarationStatement();
-        void AssignmentStatement();
-        void CoutStatement();
-        void Expression();
-        void Relational();
-        void PlusMinus();
-        void TimesDivide();
-        void Factor();
-        void Identifier();
-        void Integer();
+        ProgramNode* Program();
+        BlockNode* Block();
+        StatementGroupNode* StatementGroup();
+        StatementNode* Statement();
+        IfStatementNode* IfStatement();
+        WhileNode* WhileStatement();
+        DeclarationStatementNode* DeclarationStatement();
+        AssignmentStatementNode* AssignmentStatement();
+        CoutStatementNode* CoutStatement();
+        ExpressionNode* Expression();
+        ExpressionNode* Or();
+        ExpressionNode* And();
+        ExpressionNode* Relational();
+        ExpressionNode* PlusMinus();
+        ExpressionNode* TimesDivide();
+        ExpressionNode* Factor();
+        IdentifierNode* Identifier();
+        IntegerNode* Integer();
         ScannerClass* mScanner;
         SymbolTableClass* mSymbolTable;
 };

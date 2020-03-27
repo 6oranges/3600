@@ -27,6 +27,7 @@ int main() {
 	std::cout<<s.GetIndex("barbaque")<<std::endl;
 	s.GetValue("barbaque");
 	*/
+/* blue pink
 	SymbolTableClass st;
 	StatementGroupNode* sgn = new StatementGroupNode();
 	IdentifierNode* in = new IdentifierNode("sum",&st);
@@ -44,12 +45,17 @@ int main() {
 	BlockNode* bn = new BlockNode(sgn);
 	ProgramNode* pn = new ProgramNode(bn);
 	StartNode* sn = new StartNode(pn);
-	delete(sn);
+	delete(sn);*/
 
 
 	ScannerClass sc("text.txt");
+	//std::cout<<sc.PeekNextToken();
 	SymbolTableClass stc = SymbolTableClass();
 	ParserClass p = ParserClass(&sc,&stc);
-	p.Start();
+	StartNode* s=p.Start();
+	std::cout<<std::endl;
+	std::cout<<s<<std::endl;
+	s->interpret();
+	delete s;
 	return 0;
 }

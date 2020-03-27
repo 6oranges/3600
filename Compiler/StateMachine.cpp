@@ -52,6 +52,11 @@ StateMachineClass::StateMachineClass() {
 	mLegalMoves[START_STATE][GREATER_CHAR] = GREATER_STATE;
 	mLegalMoves[START_STATE][NOT_CHAR] = NOT_STATE;
 	mLegalMoves[START_STATE][COMMA_CHAR] = COMMA_STATE;
+	mLegalMoves[START_STATE][AND_CHAR] = BITAND_STATE;
+	mLegalMoves[START_STATE][OR_CHAR] = BITOR_STATE;
+
+	
+
 	// Comments
 	mLegalMoves[DIVIDE_STATE][STAR_CHAR] = COMMENT_STATE;
 	for (int i = 0;i < LAST_CHAR;i++) {
@@ -70,6 +75,9 @@ StateMachineClass::StateMachineClass() {
 	}
 	mLegalMoves[LINECOMMENT_STATE][NEWLINE_CHAR] = START_STATE;//FULLCOMMENT_STATE;
 	// Two character tokens
+	mLegalMoves[BITAND_STATE][AND_CHAR] = AND_STATE;
+	mLegalMoves[BITOR_STATE][OR_CHAR] = OR_STATE;
+
 	mLegalMoves[PLUS_STATE][EQUAL_CHAR] = PLUSEQUAL_STATE;
 	mLegalMoves[MINUS_STATE][EQUAL_CHAR] = MINUSEQUAL_STATE;
 	mLegalMoves[TIMES_STATE][EQUAL_CHAR] = TIMESEQUAL_STATE;
@@ -125,9 +133,13 @@ StateMachineClass::StateMachineClass() {
 	mCorrespondingTokenTypes[NOTEQUAL_STATE] = NOTEQUAL_TOKEN;
 	mCorrespondingTokenTypes[EQUAL_STATE] = EQUAL_TOKEN;
 	mCorrespondingTokenTypes[NOT_STATE] = NOT_TOKEN;
-	mCorrespondingTokenTypes[FULLSTRING_STATE] = STRING_TOKEN;
-	mCorrespondingTokenTypes[FULLCHAR_STATE] = CHAR_TOKEN;
+	//mCorrespondingTokenTypes[FULLSTRING_STATE] = STRING_TOKEN;
+	//mCorrespondingTokenTypes[FULLCHAR_STATE] = CHAR_TOKEN;
 	mCorrespondingTokenTypes[COMMA_STATE] = COMMA_TOKEN;
+	mCorrespondingTokenTypes[BITAND_STATE] = BITAND_TOKEN;
+	mCorrespondingTokenTypes[BITOR_STATE] = BITOR_TOKEN;
+	mCorrespondingTokenTypes[AND_STATE] = AND_TOKEN;
+	mCorrespondingTokenTypes[OR_STATE] = OR_TOKEN;
 
 }
 MachineState StateMachineClass::UpdateState(char currentCharacter, TokenType& correspondingTokenType) {
@@ -186,7 +198,14 @@ MachineState StateMachineClass::UpdateState(char currentCharacter, TokenType& co
 		else if (currentCharacter == ',') {
 			charType = COMMA_CHAR;
 		}
+		else if (currentCharacter == '&') {
+			charType = AND_CHAR;
+		}
+		else if (currentCharacter == '|') {
+			charType = OR_CHAR;
+		}
 	}
+	MSG("STATE:"<<mCurrentState<<" CHARTYPE:"<<charType<<" CHAR:"<<currentCharacter<<" TOKEN:"<<TokenClass::GetTokenTypeName(correspondingTokenType));
 	mCurrentState = mLegalMoves[mCurrentState][charType];
 	return mCurrentState;
 }
