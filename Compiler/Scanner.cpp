@@ -1,7 +1,7 @@
 #include "Scanner.h"
 #include "StateMachine.h"
 #include <sstream>
-#include "debug.h"
+#include "Debug.h"
 ScannerClass::ScannerClass(std::string filename)
 {
 	mFin.open(filename, std::ifstream::in);
