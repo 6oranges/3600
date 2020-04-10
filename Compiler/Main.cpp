@@ -3,6 +3,7 @@
 #include "Symbol.h"
 #include "Node.h"
 #include "Parser.h"
+#include "Instructions.h"
 int main() {
 	/*ScannerClass scanner("Text.txt");
 	while (true) {
@@ -47,7 +48,7 @@ int main() {
 	StartNode* sn = new StartNode(pn);
 	delete(sn);*/
 
-
+/*
 	ScannerClass sc("text.txt");
 	//std::cout<<sc.PeekNextToken();
 	SymbolTableClass stc = SymbolTableClass();
@@ -57,5 +58,30 @@ int main() {
 	std::cout<<s<<std::endl;
 	s->interpret();
 	delete s;
-	return 0;
+	return 0;*/
+	
+	
+	/*InstructionsClass i;
+	i.Finish();
+	i.Execute();
+	std::cout<<"Applesause"<<std::endl;*/
+	InstructionsClass code;
+	code.PushValue(1000);
+	code.PopAndWrite(); // Should print 1000
+
+
+	code.mData[10] = 2000; // Tenth variable in symbol table has value 2000
+	code.PushVariable(10);
+	code.PopAndWrite(); // Should print 2000
+
+	code.mData[10] = 2000;
+	code.PushVariable(10);
+	code.PopAndStore(11);
+	code.PushVariable(10);
+	code.PushVariable(11);
+	code.PopPopAddPush();
+	code.PopAndWrite(); // Should print 2000
+	code.Finish();
+	code.PrintAllMachineCodes();
+	code.Execute();
 }

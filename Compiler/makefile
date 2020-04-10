@@ -3,11 +3,14 @@ all: product
 
 # target: dependencies
 # <TAB>command to build target from dependencies
-product: Main.o Scanner.o Token.o StateMachine.o Symbol.o Node.o Parser.o
-	g++ -std=c++11 -o product Main.o Scanner.o Token.o StateMachine.o Symbol.o Node.o Parser.o
+product: Main.o Scanner.o Token.o StateMachine.o Symbol.o Node.o Parser.o Instructions.o
+	g++ -std=c++11 -o product Main.o Scanner.o Token.o StateMachine.o Symbol.o Node.o Parser.o Instructions.o
 
 Scanner.o: Scanner.cpp Scanner.h StateMachine.h Debug.h
 	g++ -std=c++11 -c Scanner.cpp
+
+Instructions.o: Instructions.cpp Instructions.h Debug.h
+	g++ -std=c++11 -c Instructions.cpp
 
 Token.o: Token.cpp Token.cpp Debug.h
 	g++ -std=c++11 -c Token.cpp
