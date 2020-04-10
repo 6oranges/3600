@@ -2,7 +2,7 @@
 #include <sstream>
 #include "Parser.h"
 #include "Node.h"
-#include "debug.h"
+#include "Debug.h"
 
 ParserClass::ParserClass(ScannerClass* sc, SymbolTableClass* stc)
 : mScanner(sc), mSymbolTable(stc)

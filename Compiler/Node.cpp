@@ -4,7 +4,7 @@
 #include <iostream>
 #include "Symbol.h"
 #include "Node.h"
-#include "debug.h"
+#include "Debug.h"
 std::ostream& operator<<(std::ostream& o, Node* n){
     n->string(o);
 }
