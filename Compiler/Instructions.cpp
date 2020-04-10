@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <cstdio>
 using namespace std;
-#include "instructions.h"
+#include "Instructions.h"
 
 #pragma warning( disable : 4311 )
 

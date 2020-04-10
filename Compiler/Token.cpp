@@ -1,6 +1,6 @@
 
 #include "Token.h"
-#include "debug.h"
+#include "Debug.h"
 TokenClass::TokenClass() 
 	:mType(BAD_TOKEN),mLexeme()
 {

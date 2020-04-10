@@ -1,5 +1,5 @@
 #include "StateMachine.h"
-#include "debug.h"
+#include "Debug.h"
 StateMachineClass::StateMachineClass() {
 	mCurrentState = START_STATE;
 	for (int i = 0; i < LAST_STATE; i++)
