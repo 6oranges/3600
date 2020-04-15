@@ -3,6 +3,7 @@
 #include <string>
 #include <iostream>
 #include "Symbol.h"
+#include "Instructions.h"
 class Node;
 class StartNode;
 class ProgramNode;
@@ -21,6 +22,7 @@ class Node{
         friend std::ostream& operator<<(std::ostream& o, Node* n);
         virtual std::ostream& string(std::ostream& o)=0;
         virtual void interpret()=0;
+        virtual void Code(InstructionsClass &machineCode)=0;
 };
 class StartNode: public Node { 
     public: 
@@ -28,6 +30,7 @@ class StartNode: public Node {
         StartNode(ProgramNode* pn);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
     protected:
         ProgramNode* mProgramNode;
 }; 
@@ -37,6 +40,7 @@ class ProgramNode: public Node {
         ProgramNode(BlockNode* bn);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
     protected:
         BlockNode* mBlockNode;
 };
@@ -53,6 +57,7 @@ class IfStatementNode: public StatementNode {
         void AddElse(StatementNode* sn);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
     protected:
         StatementNode* mStatement;
         ExpressionNode* mExpression;
@@ -65,6 +70,7 @@ class WhileNode: public StatementNode {
         WhileNode(StatementNode* sn, ExpressionNode* en);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
     protected:
         StatementNode* mStatement;
         ExpressionNode* mExpression;
@@ -76,6 +82,7 @@ class BlockNode: public StatementNode {
         BlockNode(StatementGroupNode* sgn);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
     protected:
         StatementGroupNode* mStatementGroupNode;
 };
@@ -86,6 +93,7 @@ class StatementGroupNode: public Node {
         void AddStatement(StatementNode* sn);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
     protected:
         std::vector<StatementNode*> mStatementNodes;
 };
@@ -96,6 +104,7 @@ class DeclarationStatementNode: public StatementNode {
         DeclarationStatementNode(IdentifierNode* in);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
     protected:
         IdentifierNode* mIdentifierNode;
 };
@@ -105,6 +114,7 @@ class AssignmentStatementNode: public StatementNode {
         AssignmentStatementNode(IdentifierNode* in, ExpressionNode* en);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
     protected:
         IdentifierNode* mIdentifierNode;
         ExpressionNode* mExpressionNode;
@@ -115,6 +125,7 @@ class CoutStatementNode: public StatementNode {
         CoutStatementNode(ExpressionNode* en);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
     protected:
         ExpressionNode* mExpressionNode;
 };
@@ -125,12 +136,14 @@ class ExpressionNode{
         ExpressionNode();
         friend std::ostream& operator<<(std::ostream& o, ExpressionNode* n);
         virtual std::ostream& string(std::ostream& o)=0;
+        virtual void CodeEvaluate(InstructionsClass &machineCode)=0;
 };
 class IntegerNode: public ExpressionNode{
     public:
         virtual int Evaluate();
         IntegerNode(int i);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
     protected:
         int mI;
 };
@@ -142,6 +155,7 @@ class IdentifierNode: public ExpressionNode{
         int GetIndex();
         IdentifierNode(std::string label, SymbolTableClass* st);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
     protected:
         std::string mLabel;
         SymbolTableClass* mSymbolTable;
@@ -151,6 +165,7 @@ class BinaryOperatorNode: public ExpressionNode{
         //virtual int Evaluate();
         virtual ~BinaryOperatorNode();
         BinaryOperatorNode(ExpressionNode* left,ExpressionNode* right);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
     protected:
         ExpressionNode* mLeft;
         ExpressionNode* mRight;
@@ -160,70 +175,82 @@ class PlusNode: public BinaryOperatorNode{
         virtual int Evaluate();
         PlusNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class MinusNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         MinusNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class TimesNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         TimesNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class DivideNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         DivideNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class LessNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         LessNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class AndNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         AndNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class OrNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         OrNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class LessEqualNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         LessEqualNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class GreaterNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         GreaterNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class GreaterEqualNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         GreaterEqualNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class EqualNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         EqualNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };
 class NotEqualNode: public BinaryOperatorNode{
     public:
         virtual int Evaluate();
         NotEqualNode(ExpressionNode* left,ExpressionNode* right);
         virtual std::ostream& string(std::ostream& o);
+        virtual void CodeEvaluate(InstructionsClass &machineCode);
 };

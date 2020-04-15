@@ -4,6 +4,29 @@
 #include "Node.h"
 #include "Parser.h"
 #include "Instructions.h"
+#include<string>
+void CodeAndExecute(std::string inputFile)
+{
+	// Create scanner, symbol table, and parser objects.
+	ScannerClass scanner(inputFile);
+	SymbolTableClass symbolTable;
+	ParserClass parser(&scanner, &symbolTable);
+
+	// Do the parsing, which results in a parse tree.
+	StartNode * root = parser.Start();
+
+	// Create the machine code instructions from the parse tree
+	InstructionsClass machineCode;
+	root->Code(machineCode);
+	machineCode.Finish();
+	machineCode.PrintAllMachineCodes();
+
+	// Execute the machine code instructions previously created
+	machineCode.Execute();
+
+	// cleanup recursively
+	delete root;
+}
 int main() {
 	/*ScannerClass scanner("Text.txt");
 	while (true) {
@@ -65,6 +88,7 @@ int main() {
 	i.Finish();
 	i.Execute();
 	std::cout<<"Applesause"<<std::endl;*/
+	/*
 	InstructionsClass code;
 	code.PushValue(1000);
 	code.PopAndWrite(); // Should print 1000
@@ -84,4 +108,9 @@ int main() {
 	code.Finish();
 	code.PrintAllMachineCodes();
 	code.Execute();
+	*/
+	std::string inputfile;
+	std::cout<<"File: ";
+	std::cin>>inputfile;
+	CodeAndExecute(inputfile);
 }
