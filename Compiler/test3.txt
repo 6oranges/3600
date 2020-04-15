@@ -1,0 +1,22 @@
+void main(){
+    int true;
+    int false;
+    true=1;
+    false=0;
+    int current;
+    int last;
+    int temp;
+    current=1;
+    last=1;
+    int i;
+    i=0;
+    while (i<50){
+        temp=current;
+        current=current+last;
+        cout<<current;
+        last=temp;
+
+
+        i=i+1;
+    }
+}

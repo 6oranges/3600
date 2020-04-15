@@ -165,7 +165,7 @@ class BinaryOperatorNode: public ExpressionNode{
         //virtual int Evaluate();
         virtual ~BinaryOperatorNode();
         BinaryOperatorNode(ExpressionNode* left,ExpressionNode* right);
-        virtual void CodeEvaluate(InstructionsClass &machineCode);
+        //virtual void CodeEvaluate(InstructionsClass &machineCode);
     protected:
         ExpressionNode* mLeft;
         ExpressionNode* mRight;

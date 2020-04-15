@@ -1,0 +1,18 @@
+void main(){
+  int j;
+  j=1+2+3*4;
+  cout<<j;
+  j=j&&0;
+  cout <<j;
+  if(j){
+    cout<<6;
+  }
+  else{
+    cout<<666;
+  }
+
+
+
+
+
+}
