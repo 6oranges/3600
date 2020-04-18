@@ -119,15 +119,32 @@ class AssignmentStatementNode: public StatementNode {
         IdentifierNode* mIdentifierNode;
         ExpressionNode* mExpressionNode;
 };
+class PlusEqualNode: public AssignmentStatementNode { 
+    public: 
+        virtual ~PlusEqualNode();
+        PlusEqualNode(IdentifierNode* in, ExpressionNode* en);
+        virtual std::ostream& string(std::ostream& o);
+        virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
+};
+class MinusEqualNode: public AssignmentStatementNode { 
+    public: 
+        virtual ~MinusEqualNode();
+        MinusEqualNode(IdentifierNode* in, ExpressionNode* en);
+        virtual std::ostream& string(std::ostream& o);
+        virtual void interpret();
+        virtual void Code(InstructionsClass &machineCode);
+};
 class CoutStatementNode: public StatementNode { 
     public: 
         virtual ~CoutStatementNode();
-        CoutStatementNode(ExpressionNode* en);
+        CoutStatementNode();
+        void addExpression(ExpressionNode* en);
         virtual std::ostream& string(std::ostream& o);
         virtual void interpret();
         virtual void Code(InstructionsClass &machineCode);
     protected:
-        ExpressionNode* mExpressionNode;
+        std::vector<ExpressionNode*> mExpressionNodes;
 };
 class ExpressionNode{
     public:

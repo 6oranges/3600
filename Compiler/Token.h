@@ -20,6 +20,7 @@ enum TokenType {
 	IDENTIFIER_TOKEN, INTEGER_TOKEN,COMMENT_TOKEN,
 	STRING_TOKEN,CHAR_TOKEN,
 	IF_TOKEN,ELSE_TOKEN,WHILE_TOKEN,
+	ENDL_TOKEN,
 	BAD_TOKEN, ENDFILE_TOKEN
 };
 const std::string gTokenTypeNames[] = {
@@ -35,6 +36,7 @@ const std::string gTokenTypeNames[] = {
 	"IDENTIFIER", "INTEGER","COMMENT",
 	"STRING","CHAR",
 	"IF","ELSE","WHILE",
+	"ENDL_TOKEN",
 	"BAD", "ENDFILE"
 };
 class TokenClass

@@ -217,22 +217,101 @@ void AssignmentStatementNode::Code(InstructionsClass &machineCode){
     int index = mIdentifierNode->GetIndex();
     machineCode.PopAndStore(index);
 }
-CoutStatementNode::CoutStatementNode(ExpressionNode* en){
+PlusEqualNode::PlusEqualNode(IdentifierNode* in,ExpressionNode* en):AssignmentStatementNode(in,en){
+    mIdentifierNode=in;
     mExpressionNode=en;
+}
+PlusEqualNode::~PlusEqualNode(){
+    MSG("deleting PlusEqualNode");
+    delete(mIdentifierNode);
+    delete(mExpressionNode);
+}
+std::ostream& PlusEqualNode::string(std::ostream& o){
+    o<<"PlusEqualNode("<<mIdentifierNode<<","<<mExpressionNode<<")";
+}
+void PlusEqualNode::interpret(){
+    mIdentifierNode->SetValue(mIdentifierNode->Evaluate()+mExpressionNode->Evaluate());
+}
+void PlusEqualNode::Code(InstructionsClass &machineCode){
+    machineCode.PushVariable(mIdentifierNode->GetIndex());
+    mExpressionNode->CodeEvaluate(machineCode);
+    machineCode.PopPopAddPush();
+    int index = mIdentifierNode->GetIndex();
+    machineCode.PopAndStore(index);
+}
+MinusEqualNode::MinusEqualNode(IdentifierNode* in,ExpressionNode* en):AssignmentStatementNode(in,en){
+}
+MinusEqualNode::~MinusEqualNode(){
+    MSG("deleting MinusEqualNode");
+    delete(mIdentifierNode);
+    delete(mExpressionNode);
+}
+std::ostream& MinusEqualNode::string(std::ostream& o){
+    o<<"MinusEqualNode("<<mIdentifierNode<<","<<mExpressionNode<<")";
+}
+void MinusEqualNode::interpret(){
+    mIdentifierNode->SetValue(mIdentifierNode->Evaluate()-mExpressionNode->Evaluate());
+}
+void MinusEqualNode::Code(InstructionsClass &machineCode){
+    machineCode.PushVariable(mIdentifierNode->GetIndex());
+    mExpressionNode->CodeEvaluate(machineCode);
+    machineCode.PopPopSubPush();
+    int index = mIdentifierNode->GetIndex();
+    machineCode.PopAndStore(index);
+}
+CoutStatementNode::CoutStatementNode(){
+}
+void CoutStatementNode::addExpression(ExpressionNode* en){
+    mExpressionNodes.push_back(en);
 }
 CoutStatementNode::~CoutStatementNode(){
     MSG("deleting CoutStatementNode");
-    delete(mExpressionNode);1+1;
+    for (int i =0;i<mExpressionNodes.size();i++){
+        if (mExpressionNodes[i]!=NULL){
+            delete(mExpressionNodes[i]);
+        }
+    }
 }
 std::ostream& CoutStatementNode::string(std::ostream& o){
-    o<<"CoutStatement("<<mExpressionNode<<")";
+    o<<"CoutStatement(";
+    if (mExpressionNodes.size()>0){
+        if (mExpressionNodes[0]!=NULL){
+            o<<mExpressionNodes[0];
+        }
+        else{
+            o<<"endl";
+        }
+    }
+    for (int i=1;i<mExpressionNodes.size();i++){
+        if (mExpressionNodes[i]!=NULL){
+            o<<","<<mExpressionNodes[i];
+        }
+        else{
+            o<<","<<"endl";
+        }
+    }
+    return o<<")";
 }
 void CoutStatementNode::interpret(){
-    std::cout<<mExpressionNode->Evaluate()<<std::endl;
+    for (int i=1;i<mExpressionNodes.size();i++){
+        if (mExpressionNodes[i]!=NULL){
+            std::cout<<mExpressionNodes[i]->Evaluate()<<" ";
+        }
+        else{
+            std::cout<<std::endl;
+        }
+    }
 }
 void CoutStatementNode::Code(InstructionsClass &machineCode){
-    mExpressionNode->CodeEvaluate(machineCode);
-    machineCode.PopAndWrite();
+    for (int i=1;i<mExpressionNodes.size();i++){
+        if (mExpressionNodes[i]!=NULL){
+            mExpressionNodes[i]->CodeEvaluate(machineCode);
+            machineCode.PopAndWrite();
+        }
+        else{
+            machineCode.WriteEndl();
+        }
+    }
 }
 ExpressionNode::ExpressionNode(){}
 ExpressionNode::~ExpressionNode(){}

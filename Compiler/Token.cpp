@@ -36,6 +36,9 @@ void TokenClass::CheckReserved() {
 		if (mLexeme == "while") {
 			mType = WHILE_TOKEN;
 		}
+		if (mLexeme == "endl") {
+			mType = ENDL_TOKEN;
+		}
 	}
 	else {
 		//std::cout << "CheckReserved: Called with a token of " << GetTokenTypeName() << std::endl;

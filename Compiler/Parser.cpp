@@ -127,27 +127,56 @@ WhileNode* ParserClass::WhileStatement(){
 AssignmentStatementNode* ParserClass::AssignmentStatement(){
     IdentifierNode* in = Identifier();
 
-	// TokenType tt = mScanner->PeekNextToken().GetTokenType();
-	// switch (tt){
-	// 	case ASSIGNMENT_TOKEN:{
-
-	// 	}
-	// 	Match(tt);
-	// 	StatementNode* e = Statement();
-	// 	in->AddElse(e);
-	// }
-
-    Match(ASSIGNMENT_TOKEN);
-    ExpressionNode* en = Expression();
-    Match(SEMICOLON_TOKEN);
-	return new AssignmentStatementNode(in,en);
+	TokenType tt = mScanner->PeekNextToken().GetTokenType();
+	switch (tt){
+		case ASSIGNMENT_TOKEN:{
+			Match(ASSIGNMENT_TOKEN);
+			ExpressionNode* en = Expression();
+			Match(SEMICOLON_TOKEN);
+			return new AssignmentStatementNode(in,en);
+		}
+		case PLUSEQUAL_TOKEN:{
+			Match(PLUSEQUAL_TOKEN);
+			ExpressionNode* en = Expression();
+			Match(SEMICOLON_TOKEN);
+			return new PlusEqualNode(in,en);
+		}
+		case MINUSEQUAL_TOKEN:{
+			Match(MINUSEQUAL_TOKEN);
+			ExpressionNode* en = Expression();
+			Match(SEMICOLON_TOKEN);
+			return new MinusEqualNode(in,en);
+		}
+	}
+    
 }
 CoutStatementNode* ParserClass::CoutStatement(){
     Match(COUT_TOKEN);
     Match(INSERTION_TOKEN);
-    ExpressionNode* en = Expression();
-    Match(SEMICOLON_TOKEN);
-	return new CoutStatementNode(en);
+    ExpressionNode* en = ExpressionOrNull();
+	CoutStatementNode* c = new CoutStatementNode();
+	c->addExpression(en);
+	while (true){
+		TokenType tt = mScanner->PeekNextToken().GetTokenType();
+		if (tt==INSERTION_TOKEN){
+			Match(tt);
+			ExpressionNode* en2 = ExpressionOrNull();
+			c->addExpression(en2);
+		}
+		else if (tt==SEMICOLON_TOKEN){
+			Match(SEMICOLON_TOKEN);
+			return c;
+		}
+	}
+}
+ExpressionNode* ParserClass::ExpressionOrNull(){
+	TokenType tt = mScanner->PeekNextToken().GetTokenType();
+	if (tt==ENDL_TOKEN){
+		return NULL;
+	}
+	else{
+		return Expression();
+	}
 }
 ExpressionNode* ParserClass::Expression(){
     return Or();

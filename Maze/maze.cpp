@@ -28,6 +28,7 @@ void Cell::Draw(int x, int y)
 		// draw walls as GL_QUADS
 		// figure out a way to draw each wall in a different color. (you don't have to save the color of the wall)
 		// figure out a way to prevent two co-planar wall from 'bleeding' on top of each other when drawing.
+		/*
 		glColor3ub((x*234589+y*43986)%256,(x*346754+y*357331)%256,(x*435745+y*544523)%256);
 		if (left){
 			glBegin(GL_QUADS);
@@ -64,6 +65,88 @@ void Cell::Draw(int x, int y)
 			glVertex3d(x,y,0);
 			glEnd();
 		}
+		*/
+		if (left){
+			int i,j;
+			i=(x*34633+y*64854)%8;
+			j=(x*72455+y*73547)%2;
+			double l, t, r, b;
+			l=i/16.0;
+			t=j/16.0;
+			r=(i+1)/16.0;
+			b=(j+1)/16.0;
+			glBegin(GL_QUADS);
+			glTexCoord2f(l,b);
+			
+			glVertex3d(x,y,0); // bottom left
+			glTexCoord2f(r,b);
+			
+			
+			
+			glVertex3d(x,y+1,0); // bottom right
+			glTexCoord2f(r,t);
+			
+			glVertex3d(x,y+1,1); // top right
+			glTexCoord2f(l,t);
+			
+			glVertex3d(x,y,1); // top left
+			glEnd();
+		}
+		if (top){
+			int i,j;
+			i=(x*357445+y*6854)%8;
+			j=(x*3454+y*34643)%2;
+			double l, t, r, b;
+			l=i/16.0;
+			t=j/16.0;
+			r=(i+1)/16.0;
+			b=(j+1)/16.0;
+			glBegin(GL_QUADS);
+			glTexCoord2f(l,b);
+			glVertex3d(x,y+1,0); // bottom left
+			glTexCoord2f(r,b);
+			glVertex3d(x+1,y+1,0); // bottom right
+			glTexCoord2f(r,t);
+			glVertex3d(x+1,y+1,1); // top right
+			glTexCoord2f(l,t);
+			glVertex3d(x,y+1,1); // top left
+			glEnd();
+		}
+		if (right){
+			int i,j;
+			i=(x*346457+y*346434)%8;
+			j=(x*34633+y*63463)%2;
+			double l, t, r, b;
+			l=i/16.0;
+			t=j/16.0;
+			r=(i+1)/16.0;
+			b=(j+1)/16.0;
+			glBegin(GL_QUADS);
+			glTexCoord2f(r,t);
+			glVertex3d(x+1,y,1); // top right
+			glTexCoord2f(l,t);
+			glVertex3d(x+1,y+1,1); // top left
+			glTexCoord2f(l,b);
+			glVertex3d(x+1,y+1,0); // bottom left
+			glTexCoord2f(r,b);
+			glVertex3d(x+1,y,0); // bottom right
+			glEnd();
+		}
+		if (bottom){
+			glBindTexture(GL_TEXTURE_2D, texName[1]); // Main Texture
+			glBegin(GL_QUADS);
+			glTexCoord2f(3,0);
+			glVertex3d(x,y,1); // top right
+			glTexCoord2f(0,0);
+			glVertex3d(x+1,y,1); // top left
+			glTexCoord2f(0,3);
+			glVertex3d(x+1,y,0); // bottom left
+			glTexCoord2f(3,3);
+			glVertex3d(x,y,0); // bottom right
+			glEnd();
+			glBindTexture(GL_TEXTURE_2D, texName[0]); // Main Texture
+		}
+
 	}
 	
 }
@@ -276,8 +359,12 @@ void Maze::RemoveWallsHAK()
 }
 void Maze::Draw()
 {
+	glEnable(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, texName[0]); // Main Texture
 	glEnable(GL_CULL_FACE);
 	for (int i = 0; i < mWidth; i++)
 		for (int j = 0; j < mHeight; j++)
 			mCells[i][j].Draw(i, j);
+	glDisable(GL_TEXTURE_2D);
 }

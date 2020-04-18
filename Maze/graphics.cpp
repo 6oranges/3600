@@ -18,6 +18,9 @@
 #include "../pglut.h"
 #include "rat.h"
 #include <chrono>
+#include <iostream>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 // Global Variables (Only what you need!)
 double screen_x = 700;
 double screen_y = 500;
@@ -31,6 +34,8 @@ Rat gRat;
 Input gInput;
 double gTheta=45*3.141592653589793238/180;
 double timet=0;
+// Textures
+unsigned int texName[num_textures];
 // 
 // Functions that draw basic primitives
 //
@@ -323,7 +328,49 @@ void mouse(int mouse_button, int state, int x, int y)
 void InitializeMyStuff()
 {
 }
+void InitializeMyTextures()
+{
+	const char max_file_size = 100;
+	char imageFiles[num_textures][max_file_size] = { "texture.png", "brick.jpg" };
 
+	glGenTextures(num_textures, texName);
+
+	for(int i=0; i<num_textures; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D, texName[i]);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		int width, height, nrChannels;
+		unsigned char* data = stbi_load(imageFiles[i], &width, &height, &nrChannels, 0);
+		if (data)
+		{	
+			if (nrChannels==3){
+				gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
+			}
+			else if (nrChannels==4){
+				gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			}
+			else{
+				std::cout<<"Invalid number of channels"<<std::endl;
+			}
+			
+			// NOTE: If the above command doesn't work, try it this way:
+				//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+				//glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		else
+		{
+			std::cout << "Failed to load texture" << std::endl;
+		}
+		stbi_image_free(data);
+	}
+}
 
 int main(int argc, char **argv)
 {
@@ -355,6 +402,7 @@ int main(int argc, char **argv)
 	glColor3d(0,0,0); // forground color
 	glClearColor(1, 1, 1, 0); // background color
 	InitializeMyStuff();
+	InitializeMyTextures();
 
 	glutMainLoop();
 

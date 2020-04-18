@@ -16,6 +16,7 @@ class ParserClass{
         DeclarationStatementNode* DeclarationStatement();
         AssignmentStatementNode* AssignmentStatement();
         CoutStatementNode* CoutStatement();
+        ExpressionNode* ExpressionOrNull();
         ExpressionNode* Expression();
         ExpressionNode* Or();
         ExpressionNode* And();
