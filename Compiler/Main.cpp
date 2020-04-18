@@ -27,6 +27,21 @@ void CodeAndExecute(std::string inputFile)
 	// cleanup recursively
 	delete root;
 }
+void Interpret(std::string inputFile)
+{
+	// Create scanner, symbol table, and parser objects.
+	ScannerClass scanner(inputFile);
+	SymbolTableClass symbolTable;
+	ParserClass parser(&scanner, &symbolTable);
+
+	// Do the parsing, which results in a parse tree.
+	StartNode * root = parser.Start();
+	std::cout<<root<<std::endl;
+	root->interpret();
+	
+	// cleanup recursively
+	delete root;
+}
 int main() {
 	/*ScannerClass scanner("Text.txt");
 	while (true) {
@@ -112,5 +127,5 @@ int main() {
 	std::string inputfile;
 	std::cout<<"File: ";
 	std::cin>>inputfile;
-	CodeAndExecute(inputfile);
+	Interpret(inputfile);
 }

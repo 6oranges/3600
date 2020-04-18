@@ -172,6 +172,7 @@ CoutStatementNode* ParserClass::CoutStatement(){
 ExpressionNode* ParserClass::ExpressionOrNull(){
 	TokenType tt = mScanner->PeekNextToken().GetTokenType();
 	if (tt==ENDL_TOKEN){
+		Match(tt);
 		return NULL;
 	}
 	else{
