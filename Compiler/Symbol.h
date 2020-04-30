@@ -26,4 +26,3 @@ private:
     std::vector<std::string> mLabels;
     std::vector<int> mValues;
 };
-//TimCalAnt3!
